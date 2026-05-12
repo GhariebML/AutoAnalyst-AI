@@ -1,0 +1,5 @@
+age,income,city,purchased
+25,50000,Cairo,yes
+32,65000,Giza,no
+41,80000,Alexandria,yes
+29,,Cairo,no
