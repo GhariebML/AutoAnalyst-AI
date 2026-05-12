@@ -1,0 +1,21 @@
+# AutoAnalyst AI CODEOWNERS
+# Replace the placeholder usernames below with real GitHub usernames.
+# CODEOWNERS helps GitHub request the right reviewers automatically.
+
+# Default owner for the full repository
+* @your-github-username
+
+# Area-specific owners - replace placeholders when team GitHub accounts are known
+/src/autoanalyst/data_loading/ @data-understanding-member
+/src/autoanalyst/data_profiling/ @data-profiling-member
+/src/autoanalyst/eda/ @eda-member
+/src/autoanalyst/preprocessing/ @preprocessing-member
+/src/autoanalyst/feature_engineering/ @feature-engineering-member
+/src/autoanalyst/modeling/ @modeling-member
+/src/autoanalyst/evaluation/ @model-evaluation-member
+/src/autoanalyst/insights/ @insight-report-member
+/src/autoanalyst/reporting/ @insight-report-member
+/app/ @dashboard-member
+/docs/ @documentation-member
+/notebooks/ @data-science-team
+/tests/ @project-lead

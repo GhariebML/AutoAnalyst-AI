@@ -131,20 +131,38 @@ print(profile)
 
 ## Team Collaboration Workflow
 
-1. Pull latest changes from `main`.
+AutoAnalyst AI uses a beginner-friendly professional GitHub workflow.
+
+### Branch Policy
+
+| Branch | Policy |
+|---|---|
+| `main` | Stable version only. No one should push directly to `main`. |
+| `develop` | Integration branch for reviewed team work. Feature branches merge here first. |
+| `feature/...` | Each member works on a separate branch created from `develop`. |
+
+### Pull Request Policy
+
+1. Start from the latest `develop` branch.
 2. Create a feature branch such as `feature/data-profiling`.
 3. Make focused changes with clear commits.
-4. Push the branch to GitHub.
-5. Open a Pull Request.
-6. Request review from at least one teammate.
-7. Merge only after review and passing checks.
+4. Push your branch to GitHub.
+5. Open a Pull Request into `develop`.
+6. Request at least one reviewer.
+7. Resolve comments and conflicts before merge.
+8. Only merge to `main` when the project lead decides `develop` is stable.
+
+> Beginner note: Do **not** push directly to `main`. This protects the stable project version and helps the team review work safely.
+
+See [`docs/workflow.md`](docs/workflow.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), and [`docs/team_branch_assignments.md`](docs/team_branch_assignments.md) for the full collaboration process.
 
 ## Branch Strategy
 
 | Branch Type | Example | Purpose |
 |---|---|---|
-| `main` | `main` | Stable project version |
-| Feature | `feature/eda-module` | New functionality |
+| Stable | `main` | Production-ready project version |
+| Integration | `develop` | Combines reviewed team work |
+| Feature | `feature/eda-analysis` | New functionality |
 | Fix | `fix/missing-values-bug` | Bug fixes |
 | Docs | `docs/update-roadmap` | Documentation changes |
 | Experiment | `experiment/model-comparison` | Temporary experiments |
