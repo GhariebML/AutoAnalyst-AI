@@ -141,6 +141,12 @@ Weekly progress should be recorded in:
 docs/weekly_updates/
 ```
 
+Detailed week-by-week task instructions are available in:
+
+```text
+docs/weekly_tasks/
+```
+
 | Sub-Team | Members | Branch |
 |---|---|---|
 | Team 1: Project Management & GitHub | Member 1 + Member 2 | `feature/project-management` |
@@ -155,6 +161,7 @@ Detailed planning documents:
 
 - [`docs/team_plan_8_weeks.md`](docs/team_plan_8_weeks.md)
 - [`docs/weekly_plan_8_weeks.md`](docs/weekly_plan_8_weeks.md)
+- [`docs/weekly_tasks/`](docs/weekly_tasks/)
 - [`docs/team_branch_assignments.md`](docs/team_branch_assignments.md)
 
 ## Team Collaboration Workflow

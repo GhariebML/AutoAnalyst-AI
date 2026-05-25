@@ -4,6 +4,8 @@
 
 This plan organizes AutoAnalyst AI across 8 weeks for 14 members divided into 7 sub-teams. Each week includes technical work, documentation work, GitHub expectations, and an end-of-week review checklist.
 
+Detailed weekly task files are available in [`docs/weekly_tasks/`](weekly_tasks/). Each detailed file includes sub-team tasks, deliverables, suggested commit messages, and end-of-week checklists.
+
 ## Week 1: Project Setup & Team Onboarding
 
 ### Main Objective
