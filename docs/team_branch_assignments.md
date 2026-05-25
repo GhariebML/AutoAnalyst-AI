@@ -16,6 +16,16 @@ This document assigns each 2-member sub-team to a professional feature branch an
 | Team 6: Evaluation & Insights | Member 11 + Member 12 | `feature/evaluation-insights` | Model evaluation, metrics, insight generation, recommendations | `src/autoanalyst/evaluation/`, `src/autoanalyst/insights/` | Evaluation module, metrics, insight generator, recommendations, tests |
 | Team 7: Reporting & Dashboard | Member 13 + Member 14 | `feature/reporting-dashboard` | Report generation, Streamlit dashboard, screenshots, final presentation support | `src/autoanalyst/reporting/`, `app/`, `reports/` | Report generator, dashboard improvements, screenshots, final report, demo guide |
 
+## Dedicated Team Documents
+
+Professional task guides for all teams are available in:
+
+```text
+docs/teams/
+```
+
+Each guide includes mission, branch, folders, weekly focus, integration duty, deliverables, and Definition of Done.
+
 ## Branch Workflow
 
 All team branches should be created from `develop`.

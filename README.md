@@ -35,21 +35,33 @@ Many students and junior data practitioners understand individual tools such as 
 | Reporting | Markdown report generation |
 | Dashboard | Streamlit upload, preview, statistics |
 
-## System Architecture
+## End-to-End System Workflow
+
+AutoAnalyst AI is designed as one integrated pipeline. The dashboard and future agent workflows should call the central pipeline instead of duplicating business logic.
 
 ```mermaid
 flowchart TD
-    A[User Dataset] --> B[Data Loader]
-    B --> C[Data Profiling]
-    C --> D[EDA Engine]
-    D --> E[Preprocessing Pipeline]
-    E --> F[Feature Engineering]
-    F --> G[Model Training]
-    G --> H[Model Evaluation]
-    H --> I[Insight Generator]
-    I --> J[Report Generator]
-    J --> K[Dashboard]
+    A[User Dataset Upload] --> B[Data Loading]
+    B --> C[Data Understanding]
+    C --> D[Data Profiling]
+    D --> E[EDA]
+    E --> F[Data Cleaning]
+    F --> G[Preprocessing]
+    G --> H[Feature Engineering]
+    H --> I[Model Training]
+    I --> J[Model Evaluation]
+    J --> K[Insight Generation]
+    K --> L[Report Generation]
+    L --> M[Dashboard Output]
 ```
+
+Central pipeline file:
+
+```text
+src/autoanalyst/pipeline.py
+```
+
+See [`docs/end_to_end_integration_strategy.md`](docs/end_to_end_integration_strategy.md) for input/output contracts and team integration rules.
 
 ## Folder Structure
 
@@ -118,15 +130,18 @@ Run tests:
 pytest
 ```
 
-Use the package in Python:
+Use the end-to-end pipeline in Python:
 
 ```python
-from autoanalyst.data_loading.loader import load_csv
-from autoanalyst.data_profiling.profiler import generate_basic_profile
+from autoanalyst.pipeline import PipelineConfig, run_analysis_pipeline
 
-df = load_csv("data/sample/example.csv")
-profile = generate_basic_profile(df)
-print(profile)
+result = run_analysis_pipeline(
+    "data/sample/example.csv",
+    PipelineConfig(target_column="purchased", model_task="classification"),
+)
+
+print(result.profile)
+print(result.insights)
 ```
 
 ## Team Collaboration & 8-Week Execution Plan

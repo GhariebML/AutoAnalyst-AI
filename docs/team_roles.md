@@ -19,6 +19,21 @@ AutoAnalyst AI is organized into 7 squads. Each squad has 2 members and owns one
 - Each Pull Request must explain what changed, how it was tested, and any limitations.
 - Python code changes should include tests where practical.
 - Documentation must be updated when behavior or usage changes.
+- Every squad must explain how its work connects to the central pipeline in `src/autoanalyst/pipeline.py`.
+
+## End-to-End Integration Ownership
+
+| Squad | Pipeline Integration Duty |
+|---|---|
+| Squad 1 | Check that issues and PRs include integration notes and validation evidence. |
+| Squad 2 | Ensure loading/profiling outputs match the pipeline input and profile contracts. |
+| Squad 3 | Return EDA outputs that can be stored in `PipelineResult.eda_results`. |
+| Squad 4 | Keep cleaning and feature functions deterministic and safe for repeated pipeline runs. |
+| Squad 5 | Make model training accept `model_ready_df`, feature columns, and a target column. |
+| Squad 6 | Keep metrics and insights structured for `PipelineResult.evaluation_results` and `PipelineResult.insights`. |
+| Squad 7 | Use `run_analysis_pipeline` in the dashboard and avoid duplicating backend logic. |
+
+See `docs/end_to_end_integration_strategy.md` for the full integration contract.
 
 ## Daily Update Format
 

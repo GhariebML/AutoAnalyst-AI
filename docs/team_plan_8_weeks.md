@@ -24,6 +24,16 @@ The team has 14 members. To keep the project organized and manageable, the work 
 | Team 6: Evaluation & Insights | Member 11 + Member 12 | Model evaluation, metrics, insight generation, recommendations | `feature/evaluation-insights` | `src/autoanalyst/evaluation/`, `src/autoanalyst/insights/` |
 | Team 7: Reporting & Dashboard | Member 13 + Member 14 | Report generation, Streamlit dashboard, screenshots, final presentation support | `feature/reporting-dashboard` | `src/autoanalyst/reporting/`, `app/`, `reports/` |
 
+## Professional Team Guides
+
+Each sub-team has a dedicated professional work guide in:
+
+```text
+docs/teams/
+```
+
+Start with [`docs/teams/README.md`](teams/README.md), then open the document for your assigned team.
+
 ## Expected Deliverables by Sub-Team
 
 | Sub-Team | Expected Deliverables |
