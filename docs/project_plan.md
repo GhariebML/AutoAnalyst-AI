@@ -1,37 +1,70 @@
-# 6-Week Project Plan
+﻿# Professional Project Plan
 
-## Week 1: Planning, GitHub Setup, Dataset Selection
+## Project Goal
 
-**Goals:** Align team, prepare repository, select dataset.  
-**Tasks:** Assign roles, create issues, choose dataset, define target questions.  
-**Deliverables:** GitHub repo, team roles, dataset description, project board.
+Build AutoAnalyst AI as a modular and agent-ready data analysis system that helps users move from raw dataset to useful insights, baseline models, and reports.
 
-## Week 2: Data Profiling and EDA
+## Team Model
 
-**Goals:** Understand data quality and initial patterns.  
-**Tasks:** Build profiling functions, create EDA notebook, inspect missing values and correlations.  
-**Deliverables:** Profiling report, EDA notebook, early findings.
+The 14-member team is divided into 7 squads. Each squad has 2 members and owns one project workstream.
 
-## Week 3: Preprocessing and Feature Engineering
+Detailed team split:
 
-**Goals:** Prepare clean data for modeling.  
-**Tasks:** Remove duplicates, handle missing values, encode categories, create features.  
-**Deliverables:** Cleaning module, feature engineering module, processed dataset.
+- `docs/team_delivery_plan.md`
+- `docs/task_specifications.md`
+- `docs/team_roles.md`
 
-## Week 4: Modeling and Evaluation
+## Delivery Phases
 
-**Goals:** Train baseline classification/regression models.  
-**Tasks:** Split data, train models, calculate metrics, compare results.  
-**Deliverables:** Modeling modules, evaluation report, baseline results.
+| Phase | Name | Main Focus |
+|---|---|---|
+| Phase 0 | Setup and Alignment | Repo setup, team assignment, baseline validation |
+| Phase 1 | Foundation Modules | Data loading, profiling, EDA, preprocessing, modeling |
+| Phase 2 | Agentic Architecture | LangChain/LangGraph workflow design and dry-run implementation |
+| Phase 3 | Dashboard and Reporting | Streamlit integration and report export |
+| Phase 4 | Testing and Documentation | QA, docs, final report |
+| Phase 5 | Final Demo | Presentation and delivery |
 
-## Week 5: Insights and Report Generation
+Full phase details:
 
-**Goals:** Convert analysis results into clear conclusions.  
-**Tasks:** Generate rule-based insights, build Markdown report, add figures.  
-**Deliverables:** Insight module, report generator, draft final report.
+- `docs/phase_plan.md`
 
-## Week 6: Dashboard, Documentation, and Final Presentation
+## Technical Direction
 
-**Goals:** Deliver a polished project demo.  
-**Tasks:** Improve Streamlit app, finalize docs, prepare presentation.  
-**Deliverables:** Dashboard, final report, final presentation, cleaned repository.
+The project should keep the current Python package structure and add an optional agentic layer:
+
+```text
+src/autoanalyst/agents/
+```
+
+The agentic layer should use:
+
+- LangChain for tools, prompts, optional LLM calls, and model abstraction.
+- LangGraph for stateful workflow orchestration.
+- Deterministic fallback logic so the project can run without API keys.
+
+## Quality Gates
+
+Before merging any squad work:
+
+```bash
+python -m compileall -q app src tests
+pytest
+```
+
+Recommended additional checks later:
+
+```bash
+ruff check .
+ruff format --check .
+```
+
+## Final Deliverables
+
+- Working Python package.
+- Streamlit dashboard.
+- Agentic LangGraph workflow prototype.
+- Tests for core modules.
+- Final report.
+- Professional documentation folder.
+- GitHub repository with clear PR workflow.

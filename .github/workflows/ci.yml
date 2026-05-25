@@ -31,5 +31,8 @@ jobs:
           python -c "import autoanalyst; print(autoanalyst.__version__)"
           python -c "from autoanalyst.data_profiling.profiler import generate_basic_profile"
 
+      - name: Compile Python files
+        run: python -m compileall -q app src tests
+
       - name: Run tests
         run: pytest

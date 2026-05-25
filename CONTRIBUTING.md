@@ -18,21 +18,33 @@ Thank you for contributing to AutoAnalyst AI. This project is designed to help t
 Use clear branch names:
 
 ```text
+feature/project-management
 feature/data-profiling
-feature/eda-analysis
-feature/data-cleaning
-feature/feature-engineering
-feature/classification-modeling
-feature/regression-modeling
-feature/model-evaluation
-feature/insight-report-generation
-feature/dashboard-development
-feature/documentation
+feature/eda-visualization
+feature/preprocessing-features
+feature/modeling
+feature/evaluation-insights
+feature/reporting-dashboard
 fix/short-bug-name
 docs/short-doc-update
 ```
 
 Do not work directly on `main`. Avoid working directly on `develop` unless you are the Project Lead doing repository maintenance.
+
+## Weekly Contribution Rules
+
+Each sub-team should:
+
+1. Pull latest changes from `develop`.
+2. Work only on its assigned feature branch.
+3. Commit small, clear changes.
+4. Push the branch regularly.
+5. Open a Pull Request into `develop`.
+6. Add a weekly update in `docs/weekly_updates/week_XX.md`.
+7. Mention blockers early.
+8. Never push directly to `main`.
+
+Assigned branches are documented in [`docs/team_branch_assignments.md`](docs/team_branch_assignments.md).
 
 ## Commit Message Format
 
@@ -63,6 +75,17 @@ Recommended types:
 | `refactor` | Code cleanup without changing behavior |
 | `chore` | Project setup, configuration, maintenance |
 
+## Pull Request Expectations
+
+Each Pull Request should include:
+
+- Clear summary.
+- Files changed.
+- Related issue if available.
+- Screenshots if dashboard or charts were changed.
+- Checklist confirming the code was tested.
+- Notes for reviewers.
+
 ## Pull Request Checklist
 
 Before opening a Pull Request, confirm:
@@ -72,6 +95,8 @@ Before opening a Pull Request, confirm:
 - [ ] My code is readable and has meaningful names.
 - [ ] I added docstrings/type hints for new Python functions.
 - [ ] I updated documentation if needed.
+- [ ] I added or updated the weekly update file if this is weekly work.
+- [ ] I ran `python -m compileall -q app src tests` locally if I changed Python code.
 - [ ] I ran `pytest` locally if I changed Python code.
 - [ ] I did not commit private files, secrets, API keys, or large raw datasets.
 - [ ] I explained what changed in the PR description.

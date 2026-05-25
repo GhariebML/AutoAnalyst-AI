@@ -5,6 +5,10 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+.pytest_cache/
+
+# Local assistant/tool backups
+.openclaw-backups/
 
 # Virtual environments
 .venv/

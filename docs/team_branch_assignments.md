@@ -1,24 +1,46 @@
-# Team Branch Assignments
+﻿# Team Branch Assignments
 
-Use this file to assign each team member to a clear responsibility and branch. Replace placeholder names with the real team member names and GitHub usernames.
+This document assigns each 2-member sub-team to a professional feature branch and main work area.
 
-| Role | Branch Name | Main Responsibility | Expected Deliverables |
-|---|---|---|---|
-| Project Lead / GitHub Manager | `feature/documentation` or `docs/project-management` | Manage repository, issues, Pull Requests, reviews, branch protection, and final integration | Organized GitHub repo, reviewed PRs, clean releases, updated project board |
-| Data Understanding Member | `feature/data-understanding` | Understand dataset context, columns, target variable, and analysis questions | Data dictionary, dataset summary, notebook notes |
-| Data Profiling Member | `feature/data-profiling` | Build profiling tools for shape, dtypes, missing values, duplicates, and quality checks | Updated `data_profiling` module, profiling report, tests |
-| EDA Member | `feature/eda-analysis` | Explore data patterns using summaries, correlations, and visual analysis | EDA notebook, analyzer functions, charts saved to `reports/figures/` |
-| Data Cleaning Member | `feature/data-cleaning` | Handle duplicate rows, missing values, inconsistent categories, and preprocessing rules | Cleaner functions, before/after cleaning notes, tests |
-| Feature Engineering Member | `feature/feature-engineering` | Create useful features, encoding helpers, and transformation utilities | Feature builder functions, examples, tests |
-| Classification Modeling Member | `feature/classification-modeling` | Build baseline classification model training workflow | Classification trainer updates, metrics, modeling notes |
-| Regression Modeling Member | `feature/regression-modeling` | Build baseline regression model training workflow | Regression trainer updates, metrics, modeling notes |
-| Model Evaluation Member | `feature/model-evaluation` | Improve classification and regression evaluation helpers | Evaluation metrics, validation examples, tests |
-| Insight & Report Generation Member | `feature/insight-report-generation` | Convert analysis results into readable insights and Markdown reports | Insight generator, report generator updates, sample report |
-| Dashboard Developer | `feature/dashboard-development` | Improve Streamlit dashboard and connect pipeline components | Dashboard pages/sections, upload flow, preview/statistics UI |
-| Documentation Support | `feature/documentation` | Keep README, docs, issue guides, and workflow instructions clear | Updated docs, screenshots if needed, beginner-friendly guides |
+> Replace `Member 1`, `Member 2`, etc. with real names and GitHub usernames when the team is finalized.
 
-## Notes
+## Branch Assignment Table
 
-- All branches should be created from `develop`.
-- Team members should open Pull Requests into `develop`, not directly into `main`.
-- If two members need the same branch, create a more specific branch such as `feature/eda-visualizations` or `feature/eda-summary-tables`.
+| Sub-Team | Members | Branch Name | Main Responsibility | Main Folder | Expected Deliverables |
+|---|---|---|---|---|---|
+| Team 1: Project Management & GitHub | Member 1 + Member 2 | `feature/project-management` | Project management, GitHub workflow, issues, PRs, repo organization | `docs/`, `.github/` | Issues, project board, PR process, docs organization, weekly tracking |
+| Team 2: Data Understanding & Profiling | Member 3 + Member 4 | `feature/data-profiling` | Dataset understanding, data dictionary, profiling, missing values, duplicates | `src/autoanalyst/data_profiling/` | Data dictionary, profiling module, missing values report, duplicate report, tests |
+| Team 3: EDA & Visualization | Member 5 + Member 6 | `feature/eda-visualization` | EDA, visualizations, correlations, distributions, target analysis | `src/autoanalyst/eda/` | EDA module, charts, correlation analysis, target analysis, EDA notes |
+| Team 4: Preprocessing & Feature Engineering | Member 7 + Member 8 | `feature/preprocessing-features` | Data cleaning, preprocessing, encoding, scaling, feature engineering | `src/autoanalyst/preprocessing/`, `src/autoanalyst/feature_engineering/` | Cleaning pipeline, preprocessing helpers, feature engineering module, tests |
+| Team 5: Machine Learning | Member 9 + Member 10 | `feature/modeling` | Classification and regression modeling, baseline models, model improvement | `src/autoanalyst/modeling/` | Baseline models, improved models, model comparison, modeling notes, tests |
+| Team 6: Evaluation & Insights | Member 11 + Member 12 | `feature/evaluation-insights` | Model evaluation, metrics, insight generation, recommendations | `src/autoanalyst/evaluation/`, `src/autoanalyst/insights/` | Evaluation module, metrics, insight generator, recommendations, tests |
+| Team 7: Reporting & Dashboard | Member 13 + Member 14 | `feature/reporting-dashboard` | Report generation, Streamlit dashboard, screenshots, final presentation support | `src/autoanalyst/reporting/`, `app/`, `reports/` | Report generator, dashboard improvements, screenshots, final report, demo guide |
+
+## Branch Workflow
+
+All team branches should be created from `develop`.
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-team-branch
+```
+
+All Pull Requests should target `develop`. The `main` branch is reserved for stable releases only.
+
+## Required Validation Before PR
+
+```bash
+python -m compileall -q app src tests
+pytest
+```
+
+## Weekly Update Requirement
+
+Each team must update the correct weekly file:
+
+```text
+docs/weekly_updates/week_XX.md
+```
+
+Include completed tasks, changed files, PR links, blockers, decisions, and next-week plans.

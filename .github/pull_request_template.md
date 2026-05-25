@@ -1,4 +1,4 @@
-## Summary of Changes
+﻿## Summary
 
 Briefly describe what this Pull Request changes.
 
@@ -9,13 +9,13 @@ Closes #
 ## Type of Change
 
 - [ ] Feature
-- [ ] Bug fix
-- [ ] Documentation update
-- [ ] Test update
-- [ ] Refactor / cleanup
-- [ ] Project configuration
+- [ ] Bug Fix
+- [ ] Documentation
+- [ ] Refactor
+- [ ] Test
+- [ ] Other
 
-## What Was Changed?
+## Files Changed
 
 - 
 - 
@@ -26,24 +26,24 @@ Closes #
 Describe how you tested your changes.
 
 ```bash
+python -m compileall -q app src tests
 pytest
 ```
 
-## Screenshots / Output
+## Screenshots, If Applicable
 
-Add screenshots, charts, Streamlit screenshots, or terminal output if applicable.
+Add screenshots for dashboard, charts, reports, or visual output changes.
 
 ## Checklist
 
-- [ ] My branch was created from `develop`
-- [ ] This PR targets `develop`, not `main`
-- [ ] I used a clear commit message format
-- [ ] I added/updated tests if Python code changed
+- [ ] I worked on the correct feature branch
+- [ ] I pulled the latest changes from `develop`
+- [ ] My code runs locally
 - [ ] I updated documentation if needed
-- [ ] I ran tests or performed manual checks
+- [ ] I added/updated the weekly update file
+- [ ] I am requesting review before merge
 - [ ] I did not include secrets, API keys, private files, or large raw datasets
-- [ ] I added notes for the reviewer if anything needs attention
 
 ## Notes for Reviewer
 
-Mention any specific files, decisions, or questions the reviewer should focus on.
+Mention any specific files, decisions, limitations, or questions the reviewer should focus on.

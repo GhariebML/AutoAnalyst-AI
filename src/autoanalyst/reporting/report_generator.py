@@ -13,6 +13,5 @@ def create_markdown_report(title: str, insights: list[str], output_path: str) ->
     lines = [f"# {title}", "", "## Key Insights", ""]
     lines.extend(f"- {insight}" for insight in insights)
     lines.append("")
-    path.write_text("
-".join(lines), encoding="utf-8")
+    path.write_text("\n".join(lines), encoding="utf-8")
     return path

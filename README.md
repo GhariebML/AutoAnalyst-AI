@@ -129,6 +129,34 @@ profile = generate_basic_profile(df)
 print(profile)
 ```
 
+## Team Collaboration & 8-Week Execution Plan
+
+AutoAnalyst AI is organized for a 14-member team divided into 7 sub-teams. Each sub-team has 2 members, one main responsibility, and one dedicated feature branch. The full execution plan is divided across 8 weeks.
+
+Every sub-team should work on its assigned feature branch and open Pull Requests into `develop`. The `main` branch is only for stable releases. Direct pushes to `main` are not allowed.
+
+Weekly progress should be recorded in:
+
+```text
+docs/weekly_updates/
+```
+
+| Sub-Team | Members | Branch |
+|---|---|---|
+| Team 1: Project Management & GitHub | Member 1 + Member 2 | `feature/project-management` |
+| Team 2: Data Understanding & Profiling | Member 3 + Member 4 | `feature/data-profiling` |
+| Team 3: EDA & Visualization | Member 5 + Member 6 | `feature/eda-visualization` |
+| Team 4: Preprocessing & Feature Engineering | Member 7 + Member 8 | `feature/preprocessing-features` |
+| Team 5: Machine Learning | Member 9 + Member 10 | `feature/modeling` |
+| Team 6: Evaluation & Insights | Member 11 + Member 12 | `feature/evaluation-insights` |
+| Team 7: Reporting & Dashboard | Member 13 + Member 14 | `feature/reporting-dashboard` |
+
+Detailed planning documents:
+
+- [`docs/team_plan_8_weeks.md`](docs/team_plan_8_weeks.md)
+- [`docs/weekly_plan_8_weeks.md`](docs/weekly_plan_8_weeks.md)
+- [`docs/team_branch_assignments.md`](docs/team_branch_assignments.md)
+
 ## Team Collaboration Workflow
 
 AutoAnalyst AI uses a beginner-friendly professional GitHub workflow.
@@ -184,14 +212,18 @@ See [`docs/team_roles.md`](docs/team_roles.md) for detailed responsibilities.
 
 ## Roadmap
 
-- Week 1: Planning, GitHub setup, dataset selection
-- Week 2: Data profiling and EDA
-- Week 3: Preprocessing and feature engineering
-- Week 4: Modeling and evaluation
-- Week 5: Insights and report generation
-- Week 6: Dashboard, documentation, and final presentation
+The professional delivery plan is now organized across 8 weeks:
 
-See [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project_plan.md`](docs/project_plan.md).
+- Week 1: Project setup and team onboarding
+- Week 2: Data understanding and basic profiling
+- Week 3: Exploratory data analysis
+- Week 4: Data cleaning and preprocessing
+- Week 5: Feature engineering and baseline models
+- Week 6: Model improvement and evaluation
+- Week 7: Insight generation, report, and dashboard
+- Week 8: Final integration, testing, and presentation
+
+See [`docs/weekly_plan_8_weeks.md`](docs/weekly_plan_8_weeks.md), [`docs/team_plan_8_weeks.md`](docs/team_plan_8_weeks.md), and [`docs/project_plan.md`](docs/project_plan.md).
 
 ## Future Improvements
 

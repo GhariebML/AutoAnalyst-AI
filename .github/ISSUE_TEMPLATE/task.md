@@ -1,38 +1,38 @@
----
-name: Task
-about: Create a clear work item for a team member
-title: "[Task]: "
-labels: task
-assignees: ""
----
+﻿## Task Description
 
-## Task Description
+Describe the task clearly. Include the problem, expected change, and why it matters.
 
-Describe the task clearly.
+## Assigned Team
 
-## Assigned Role / Member
+- Team:
+- Members:
 
-Who should work on this task?
+## Week Number
+
+Week:
+
+## Expected Deliverables
+
+- 
+- 
+- 
 
 ## Related Branch
 
-Example: `feature/data-profiling`
+Branch:
 
-## Deliverables
+## Main Folder / Files
 
-- [ ] Deliverable 1
-- [ ] Deliverable 2
-- [ ] Deliverable 3
+- 
 
-## Definition of Done
+## Checklist
 
-This task is done when:
+- [ ] Code completed
+- [ ] Documentation updated
+- [ ] Tested locally
+- [ ] Pull Request opened
+- [ ] Weekly update added
 
-- [ ] Code/docs are complete
-- [ ] Tests or manual checks were performed
-- [ ] Pull Request was opened
-- [ ] Reviewer feedback was handled
+## Notes / Blockers
 
-## Notes
-
-Add any helpful context here.
+Add any blockers, questions, or review notes here.
