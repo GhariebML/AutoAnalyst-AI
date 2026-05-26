@@ -6,6 +6,8 @@ This plan organizes AutoAnalyst AI across 8 weeks for 14 members divided into 7 
 
 Detailed weekly task files are available in [`docs/weekly_tasks/`](weekly_tasks/). Each detailed file includes sub-team tasks, deliverables, suggested commit messages, and end-of-week checklists.
 
+Integration strategy: every week should move the project closer to one end-to-end workflow powered by `src/autoanalyst/pipeline.py`. Teams should document how their outputs connect to the central pipeline and dashboard.
+
 ## Week 1: Project Setup & Team Onboarding
 
 ### Main Objective
@@ -29,6 +31,7 @@ Prepare the repository, team roles, branches, GitHub workflow, dataset selection
 - Repository can be installed and tested locally.
 - Dataset candidate selected.
 - Initial technical scope confirmed.
+- End-to-end workflow and pipeline contracts reviewed by all teams.
 
 ### Expected Documentation Deliverables
 
@@ -77,6 +80,7 @@ Understand the dataset and create the basic data profiling module.
 - Duplicate count.
 - Data types summary.
 - Unique values summary.
+- Profiling outputs compatible with `PipelineResult.profile` and `PipelineResult.missing_values_report`.
 
 ### Expected Documentation Deliverables
 
@@ -120,6 +124,7 @@ Perform deeper exploratory data analysis and extract initial insights.
 - Correlation analysis.
 - Target analysis.
 - Visual charts saved.
+- EDA outputs structured for `PipelineResult.eda_results`.
 
 ### Expected Documentation Deliverables
 
@@ -164,6 +169,7 @@ Prepare the dataset for machine learning.
 - Preprocessing pipeline.
 - Encoded data.
 - Train/test split ready.
+- Cleaned and model-ready data compatible with the central pipeline.
 
 ### Expected Documentation Deliverables
 
@@ -208,6 +214,7 @@ Build the first working version of the machine learning workflow.
 - Baseline models trained.
 - First model results.
 - Metrics comparison table.
+- Baseline model path callable from `run_analysis_pipeline` when a target column is configured.
 
 ### Expected Documentation Deliverables
 
@@ -252,6 +259,7 @@ Improve model results and create a professional evaluation module.
 - Evaluation module.
 - Confusion matrix or regression metrics.
 - Best model selected.
+- Evaluation output structured for `PipelineResult.evaluation_results`.
 
 ### Expected Documentation Deliverables
 
@@ -296,6 +304,7 @@ Connect the system outputs into a clear product-like experience.
 - Streamlit dashboard.
 - Best model documented.
 - End-to-end pipeline connected.
+- Dashboard calls `run_analysis_pipeline` instead of duplicating backend analysis logic.
 
 ### Expected Documentation Deliverables
 
@@ -339,6 +348,7 @@ Finalize the project and prepare it for GitHub, demo, presentation, and portfoli
 - Final dashboard.
 - End-to-end pipeline validation.
 - Final tested project.
+- Integration tests confirm dataset upload-to-dashboard workflow outputs are available.
 
 ### Expected Documentation Deliverables
 
