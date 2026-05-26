@@ -146,7 +146,7 @@ print(result.insights)
 
 ## Team Collaboration & 8-Week Execution Plan
 
-AutoAnalyst AI is organized for a 14-member team divided into 7 sub-teams. Each sub-team has 2 members, one main responsibility, and one dedicated feature branch. The full execution plan is divided across 8 weeks.
+AutoAnalyst AI is organized into 7 sub-teams. Each sub-team has one main responsibility and one dedicated feature branch. Team 1 is Mohamed Gharieb for project management, GitHub workflow, and system integration. The full execution plan is divided across 8 weeks.
 
 Every sub-team should work on its assigned feature branch and open Pull Requests into `develop`. The `main` branch is only for stable releases. Direct pushes to `main` are not allowed.
 
@@ -164,13 +164,13 @@ docs/weekly_tasks/
 
 | Sub-Team | Members | Branch |
 |---|---|---|
-| Team 1: Project Management & GitHub | Member 1 + Member 2 | `feature/project-management` |
-| Team 2: Data Understanding & Profiling | Member 3 + Member 4 | `feature/data-profiling` |
-| Team 3: EDA & Visualization | Member 5 + Member 6 | `feature/eda-visualization` |
-| Team 4: Preprocessing & Feature Engineering | Member 7 + Member 8 | `feature/preprocessing-features` |
-| Team 5: Machine Learning | Member 9 + Member 10 | `feature/modeling` |
-| Team 6: Evaluation & Insights | Member 11 + Member 12 | `feature/evaluation-insights` |
-| Team 7: Reporting & Dashboard | Member 13 + Member 14 | `feature/reporting-dashboard` |
+| Team 1: Project Management & GitHub / System Integration | Mohamed Gharieb | `feature/project-management` |
+| Team 2: Data Understanding & Profiling | حازم + محمود ماهر | `feature/data-profiling` |
+| Team 3: EDA & Visualization | أيه + آيه عماد | `feature/eda-visualization` |
+| Team 4: Preprocessing & Feature Engineering | بسمه + رضوي | `feature/preprocessing-features` |
+| Team 5: Machine Learning | الكومي + الشايب | `feature/modeling` |
+| Team 6: Evaluation & Insights | سهاد + مروة | `feature/evaluation-insights` |
+| Team 7: Reporting & Dashboard | يمني + محمد كمال | `feature/reporting-dashboard` |
 
 Detailed planning documents:
 
@@ -219,16 +219,13 @@ See [`docs/workflow.md`](docs/workflow.md), [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ## Team Roles
 
-- Project Lead / GitHub Manager
-- Data Understanding Member
-- Data Profiling Member
-- EDA Member
-- Data Cleaning Member
-- Feature Engineering Member
-- Classification Modeling Member
-- Regression Modeling Member
-- Insight & Report Generation Member
-- Dashboard Developer
+- Team 1: Project Management & GitHub / System Integration — Mohamed Gharieb
+- Team 2: Data Understanding & Profiling — حازم + محمود ماهر
+- Team 3: EDA & Visualization — أيه + آيه عماد
+- Team 4: Preprocessing & Feature Engineering — بسمه + رضوي
+- Team 5: Machine Learning — الكومي + الشايب
+- Team 6: Evaluation & Insights — سهاد + مروة
+- Team 7: Reporting & Dashboard — يمني + محمد كمال
 
 See [`docs/team_roles.md`](docs/team_roles.md) for detailed responsibilities.
 
@@ -258,12 +255,23 @@ See [`docs/weekly_plan_8_weeks.md`](docs/weekly_plan_8_weeks.md), [`docs/team_pl
 
 ## Contributors
 
-Add team members here:
+Final team members:
 
 | Name | Role | GitHub |
 |---|---|---|
-| Gharieb | Project Lead | `@username` |
-| Member 2 | Data Understanding | `@username` |
+| Mohamed Gharieb | Project Management & GitHub / System Integration | `@username` |
+| حازم | Data Understanding & Profiling | `@username` |
+| محمود ماهر | Data Understanding & Profiling | `@username` |
+| أيه | EDA & Visualization | `@username` |
+| آيه عماد | EDA & Visualization | `@username` |
+| بسمه | Preprocessing & Feature Engineering | `@username` |
+| رضوي | Preprocessing & Feature Engineering | `@username` |
+| الكومي | Machine Learning | `@username` |
+| الشايب | Machine Learning | `@username` |
+| سهاد | Evaluation & Insights | `@username` |
+| مروة | Evaluation & Insights | `@username` |
+| يمني | Reporting & Dashboard | `@username` |
+| محمد كمال | Reporting & Dashboard | `@username` |
 
 ## License
 
