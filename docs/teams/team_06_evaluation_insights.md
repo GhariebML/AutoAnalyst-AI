@@ -1,11 +1,9 @@
-﻿# Team 6 — Evaluation & Insights
+# Team 6 — Evaluation & Insights
 
 ## Members
 
-- Member 11
-- Member 12
-
-> Replace placeholders with real names and GitHub usernames.
+- سهاد
+- مروة
 
 ## Main Mission
 
@@ -58,6 +56,24 @@ Evaluation and insight outputs should be dictionaries/lists that are easy to dis
 | 6 | Main evaluation module |
 | 7 | Rule-based insight generator |
 | 8 | Final insights and recommendations |
+
+## Step-by-Step Execution Guide
+
+Team 6 uses the shared step-by-step execution guide for metric selection, evaluation helpers, insight generation, reporting outputs, and validation.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 

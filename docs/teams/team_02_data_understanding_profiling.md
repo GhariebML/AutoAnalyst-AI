@@ -1,11 +1,9 @@
-﻿# Team 2 — Data Understanding & Profiling
+# Team 2 — Data Understanding & Profiling
 
 ## Members
 
-- Member 3
-- Member 4
-
-> Replace placeholders with real names and GitHub usernames.
+- حازم
+- محمود ماهر
 
 ## Main Mission
 
@@ -59,6 +57,24 @@ Profiling functions should be deterministic, reusable, and safe for dashboard us
 | 6 | Feature impact and data limitation notes |
 | 7 | Final dataset documentation review |
 | 8 | Final data dictionary and profile summary |
+
+## Step-by-Step Execution Guide
+
+Team 2 uses the shared step-by-step execution guide for dataset selection, data dictionary work, loading validation, profiling outputs, tests, and handoff notes.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 

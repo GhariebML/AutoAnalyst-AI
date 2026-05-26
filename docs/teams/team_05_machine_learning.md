@@ -1,11 +1,9 @@
-﻿# Team 5 — Machine Learning
+# Team 5 — Machine Learning
 
 ## Members
 
-- Member 9
-- Member 10
-
-> Replace placeholders with real names and GitHub usernames.
+- الكومي
+- الشايب
 
 ## Main Mission
 
@@ -59,6 +57,24 @@ Modeling should consume model-ready data from the pipeline, not reload or clean 
 | 6 | Model improvement and comparison |
 | 7 | Best model documentation |
 | 8 | Final modeling workflow validation |
+
+## Step-by-Step Execution Guide
+
+Team 5 uses the shared step-by-step execution guide for model input checks, baseline models, model comparison, validation, and handoff to evaluation.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 

@@ -1,11 +1,9 @@
-﻿# Team 4 — Preprocessing & Feature Engineering
+# Team 4 — Preprocessing & Feature Engineering
 
 ## Members
 
-- Member 7
-- Member 8
-
-> Replace placeholders with real names and GitHub usernames.
+- بسمه
+- رضوي
 
 ## Main Mission
 
@@ -59,6 +57,24 @@ Preprocessing functions must not mutate the original DataFrame unexpectedly.
 | 6 | Improve preprocessing based on model results |
 | 7 | Stabilize full preprocessing flow |
 | 8 | Final preprocessing validation |
+
+## Step-by-Step Execution Guide
+
+Team 4 uses the shared step-by-step execution guide for cleaning decisions, preprocessing functions, feature engineering, output contracts, tests, and documentation.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 

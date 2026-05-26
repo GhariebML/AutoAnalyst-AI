@@ -1,11 +1,9 @@
-﻿# Team 7 — Reporting & Dashboard
+# Team 7 — Reporting & Dashboard
 
 ## Members
 
-- Member 13
-- Member 14
-
-> Replace placeholders with real names and GitHub usernames.
+- يمني
+- محمد كمال
 
 ## Main Mission
 
@@ -57,6 +55,24 @@ The dashboard should display `PipelineResult` fields. It should not reimplement 
 | 6 | Evaluation dashboard section |
 | 7 | Full report/dashboard workflow |
 | 8 | Final README, dashboard, demo, presentation |
+
+## Step-by-Step Execution Guide
+
+Team 7 uses the shared step-by-step execution guide for Streamlit workflow, pipeline display, report generation, error handling, screenshots, and demo preparation.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 
