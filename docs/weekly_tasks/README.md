@@ -1,10 +1,10 @@
-﻿# AutoAnalyst AI — Detailed Weekly Team Tasks
+# AutoAnalyst AI — Detailed Weekly Team Tasks
 
-This folder contains the detailed weekly execution plan for the 14-member AutoAnalyst AI team.
+This folder contains the detailed weekly execution plan for the AutoAnalyst AI teams.
 
 The team is divided into 7 sub-teams:
 
-1. Project Management & GitHub
+1. Project Management & GitHub / System Integration
 2. Data Understanding & Profiling
 3. EDA & Visualization
 4. Preprocessing & Feature Engineering
