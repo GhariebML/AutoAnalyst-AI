@@ -178,6 +178,7 @@ Detailed planning documents:
 - [`docs/weekly_plan_8_weeks.md`](docs/weekly_plan_8_weeks.md)
 - [`docs/weekly_tasks/`](docs/weekly_tasks/)
 - [`docs/team_branch_assignments.md`](docs/team_branch_assignments.md)
+- [`docs/team_step_by_step_execution_guide.md`](docs/team_step_by_step_execution_guide.md)
 
 ## Team Collaboration Workflow
 

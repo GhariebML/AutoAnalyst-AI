@@ -1,11 +1,9 @@
-﻿# Team 3 — EDA & Visualization
+# Team 3 — EDA & Visualization
 
 ## Members
 
-- Member 5
-- Member 6
-
-> Replace placeholders with real names and GitHub usernames.
+- أيه
+- آيه عماد
 
 ## Main Mission
 
@@ -57,6 +55,24 @@ EDA functions should return DataFrames, dictionaries, or figure paths that the d
 | 6 | Model evaluation charts |
 | 7 | Final dashboard/report charts |
 | 8 | Final visualization polish |
+
+## Step-by-Step Execution Guide
+
+Team 3 uses the shared step-by-step execution guide for EDA questions, summary helpers, visualization outputs, chart saving, EDA notes, and validation.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 

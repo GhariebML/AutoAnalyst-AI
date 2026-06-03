@@ -1,4 +1,4 @@
-﻿# Team Documentation Hub
+# Team Documentation Hub
 
 This folder contains professional work guides for each AutoAnalyst AI sub-team.
 
@@ -19,13 +19,23 @@ Each team document explains:
 
 | Team | Responsibility | Document |
 |---|---|---|
-| Team 1 | Project Management & GitHub | [`team_01_project_management_github.md`](team_01_project_management_github.md) |
+| Team 1 | Project Management & GitHub / System Integration | [`team_01_project_management_github.md`](team_01_project_management_github.md) |
 | Team 2 | Data Understanding & Profiling | [`team_02_data_understanding_profiling.md`](team_02_data_understanding_profiling.md) |
 | Team 3 | EDA & Visualization | [`team_03_eda_visualization.md`](team_03_eda_visualization.md) |
 | Team 4 | Preprocessing & Feature Engineering | [`team_04_preprocessing_feature_engineering.md`](team_04_preprocessing_feature_engineering.md) |
 | Team 5 | Machine Learning | [`team_05_machine_learning.md`](team_05_machine_learning.md) |
 | Team 6 | Evaluation & Insights | [`team_06_evaluation_insights.md`](team_06_evaluation_insights.md) |
 | Team 7 | Reporting & Dashboard | [`team_07_reporting_dashboard.md`](team_07_reporting_dashboard.md) |
+
+## Step-by-Step Task Completion Guide
+
+For detailed instructions on how each team should finish tasks, validate work, update weekly notes, and open Pull Requests, use:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+This guide includes specific steps for all 7 teams and a shared Pull Request checklist.
 
 ## Required Team Workflow
 

@@ -48,27 +48,17 @@ flowchart TD
 8. **Insight Generator**: Produces readable observations.
 9. **Report Generator**: Exports Markdown reports.
 10. **Streamlit Dashboard**: User-facing interface.
-11. **LangChain/LangGraph Agents**: Optional orchestration layer for a professional multi-agent workflow.
+11. **Optional Future Orchestration Layer**: Future extension point for agentic or automated workflow orchestration after the core team deliverables are complete.
 
-## Suggested Agent Package
+## Optional Future Orchestration Package
+
+If the project later adds an agentic workflow, keep it isolated from the deterministic analytics modules:
 
 ```text
 src/autoanalyst/agents/
-├── state.py
-├── graph.py
-├── tools.py
-├── prompts.py
-├── supervisor.py
-├── dataset_intake_agent.py
-├── profiling_agent.py
-├── eda_agent.py
-├── cleaning_agent.py
-├── feature_agent.py
-├── modeling_agent.py
-├── evaluation_agent.py
-├── insight_agent.py
-└── report_agent.py
 ```
+
+This future layer should call the tested pipeline functions instead of replacing them.
 
 ## Architecture Rule
 

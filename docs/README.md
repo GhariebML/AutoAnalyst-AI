@@ -1,4 +1,4 @@
-﻿# AutoAnalyst AI Documentation Hub
+# AutoAnalyst AI Documentation Hub
 
 This folder contains the professional project documentation for the AutoAnalyst AI team.
 
@@ -7,11 +7,12 @@ This folder contains the professional project documentation for the AutoAnalyst 
 | File | Purpose |
 |---|---|
 | `project_overview.md` | Business goal, scope, users, and expected product outcome |
-| `team_delivery_plan.md` | 14-member team split into 7 two-person squads with tasks and deliverables |
+| `team_delivery_plan.md` | Team delivery plan with tasks and deliverables |
 | `phase_plan.md` | Project phases, milestones, and acceptance criteria |
 | `agentic_architecture_langchain_langgraph.md` | Professional LangChain/LangGraph multi-agent architecture plan |
 | `end_to_end_integration_strategy.md` | Central pipeline, input/output contracts, and integration rules |
-| `task_specifications.md` | Detailed task requirements for each two-member squad |
+| `task_specifications.md` | Detailed task requirements for each team |
+| `team_step_by_step_execution_guide.md` | Step-by-step instructions for each team to finish assigned tasks, validate work, and open PRs |
 | `system_architecture.md` | Technical architecture and data flow |
 | `workflow.md` | Git/GitHub collaboration workflow |
 | `team_roles.md` | Role responsibilities and ownership |
@@ -28,8 +29,9 @@ This folder contains the professional project documentation for the AutoAnalyst 
 4. `team_delivery_plan.md`
 5. `phase_plan.md`
 6. `task_specifications.md`
-7. `teams/README.md`
-8. `workflow.md`
+7. `team_step_by_step_execution_guide.md`
+8. `teams/README.md`
+9. `workflow.md`
 
 ## Working Rule
 

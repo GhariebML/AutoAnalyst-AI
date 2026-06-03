@@ -1,11 +1,8 @@
-﻿# Team 1 — Project Management & GitHub
+# Team 1 — Project Management & GitHub
 
 ## Members
 
-- Member 1
-- Member 2
-
-> Replace placeholders with real names and GitHub usernames.
+- Mohamed Gharieb
 
 ## Main Mission
 
@@ -56,6 +53,24 @@ PRs should not be approved if they create disconnected work without an integrati
 | 6 | Check evaluation quality and test status |
 | 7 | Prepare final integration checklist |
 | 8 | Final release readiness, issue cleanup, demo support |
+
+## Step-by-Step Execution Guide
+
+Team 1 uses the shared step-by-step execution guide for GitHub workflow, documentation review, issue tracking, PR review, and system integration coordination.
+
+Detailed instructions are available in:
+
+```text
+docs/team_step_by_step_execution_guide.md
+```
+
+Before opening a Pull Request, each team should confirm:
+
+- The assigned task is complete.
+- The changed files match the team responsibility.
+- Outputs are documented for downstream teams.
+- Tests or manual verification notes are included.
+- The Pull Request targets `develop`.
 
 ## Expected Deliverables
 
