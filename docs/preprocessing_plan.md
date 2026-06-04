@@ -1,149 +1,28 @@
-# Preprocessing Plan - Credit Risk Dataset
+# Team 4 — Preprocessing & Feature Engineering Plan (Week 1)
 
-## Team 4: Preprocessing & Feature Engineering
+## 1. Dataset Overview
+We are working with the **Credit Risk Dataset**. It contains approximately 32,000 rows and 12 features, including both numerical and categorical data. The target variable is `loan_status` (Binary Classification: Default vs. Non-Default).
 
-### Objective
-Prepare the dataset for machine learning by cleaning data, handling missing values, encoding categorical features, scaling numerical features, and creating useful engineered features.
+## 2. Expected Data Issues
+Based on our initial review of the dataset, we expect the following challenges:
+* **Missing Values:** Commonly found in columns like `person_emp_length` (Employment length) and `loan_int_rate` (Interest rate).
+* **Duplicates:** Potential exact row duplicates that need to be removed.
+* **Outliers:** Extreme and illogical values, particularly in `person_age` (e.g., ages > 100) and `person_emp_length` (e.g., > 60 years).
+* **Categorical Columns:** Columns like `person_home_ownership`, `loan_intent`, `loan_grade`, and `cb_person_default_on_file` need to be converted to numerical formats.
+* **Imbalanced Scaling:** High variance between features (e.g., `person_income` in the thousands vs. `person_age` in the tens).
 
----
+## 3. Proposed Cleaning & Preprocessing Steps
+To prepare the data for the Machine Learning models (Team 5), we plan to apply the following steps:
+1.  **Handling Missing Data:** Use **Median Imputation** for numerical columns like `loan_int_rate` and `person_emp_length` as it is robust to outliers.
+2.  **Handling Duplicates:** Drop all exact full-row duplicates to prevent data leakage.
+3.  **Handling Outliers:** Filter out illogical values (e.g., remove rows where age > 100 or employment length > 60). 
+4.  **Encoding Categorical Data:**
+    * *Binary Encoding:* Map `cb_person_default_on_file` (Y/N) to (1/0).
+    * *Ordinal Encoding:* Convert `loan_grade` (A-G) to sequential numbers (0-6) to preserve risk order.
+    * *One-Hot Encoding:* Apply to nominal features (`person_home_ownership`, `loan_intent`) using `drop_first=True`.
+5.  **Feature Scaling:** Apply `StandardScaler` or `RobustScaler` to ensure all numerical features contribute equally to the model.
 
-# Dataset Overview
-
-Target Variable:
-
-- loan_status
-    - 0 = Non-default
-    - 1 = Default
-
-Dataset Size:
-
-- Rows: 32,581
-- Columns: 12
-
----
-
-# Column Classification
-
-## Numerical Columns
-
-- person_age
-- person_income
-- person_emp_length
-- loan_amnt
-- loan_int_rate
-- loan_percent_income
-- cb_person_cred_hist_length
-
-## Categorical Columns
-
-- person_home_ownership
-- loan_intent
-- loan_grade
-- cb_person_default_on_file
-
-## Target Column
-
-- loan_status
-
-## Date/Time Columns
-
-No date/time columns detected.
-
----
-
-# Expected Data Quality Issues
-
-## Missing Values
-
-- loan_int_rate: 3116 missing values
-- person_emp_length: 895 missing values
-
-Expected handling:
-- Fill numerical missing values using Median.
-
-## Duplicate Records
-
-- 165 duplicate rows detected
-
-Expected handling:
-- Remove duplicate rows before training.
-
-## Outliers
-
-Potential outliers may exist in:
-- person_income
-- loan_amnt
-- person_age
-- person_emp_length
-
----
-
-# Encoding Strategy
-
-## One-Hot Encoding
-
-- person_home_ownership
-- loan_intent
-
-## Ordinal Encoding
-
-- loan_grade
-
-Order:
-A < B < C < D < E < F < G
-
-## Binary Encoding
-
-- cb_person_default_on_file
-
-Mapping:
-- Y -> 1
-- N -> 0
-
----
-
-# Scaling Strategy
-
-Recommended scaler:
-- StandardScaler
-
-Columns:
-- person_age
-- person_income
-- person_emp_length
-- loan_amnt
-- loan_int_rate
-- loan_percent_income
-- cb_person_cred_hist_length
-
----
-
-# Train-Test Split
-
-Recommended:
-- 80% Train
-- 20% Test
-
----
-
-# Feature Engineering Ideas
-
-1. Income-to-Loan Ratio
-2. Employment Stability Score
-3. Credit History to Age Ratio
-4. Interest Burden Feature
-5. High Risk Flag
-
----
-
-# Proposed Preprocessing Pipeline
-
-1. Load dataset.
-2. Remove duplicate rows.
-3. Handle missing values.
-4. Detect and treat outliers.
-5. Encode categorical variables.
-6. Split data into train/test.
-7. Scale numerical features.
-8. Apply feature engineering.
-9. Save processed dataset.
+## 4. Feature Engineering Ideas
+To extract deeper insights and help the model, we propose creating the following new features:
+* **`loan_to_income_ratio`:** (loan_amnt / person_income) to measure the borrower's debt burden.
+* **`age_to_emp_length_ratio`:** (person_emp_length / person_age) to understand employment stability relative to age.
