@@ -1,0 +1,1 @@
+{"version": "1.0.0", "accuracy": 0.86, "expected_inputs": ["budget", "channel_clicks", "clicks_per_dollar"]}

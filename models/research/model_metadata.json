@@ -1,0 +1,8 @@
+{
+  "model_name": "Research_Topic_Classifier_NaiveBayes",
+  "version": "1.0.0",
+  "target_metric": "F1-Score",
+  "score": 0.23710462033837143,
+  "features_count": 50,
+  "training_date": "2026-07-11 16:18:59"
+}

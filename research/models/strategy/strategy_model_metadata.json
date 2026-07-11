@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "accuracy": 0.845,
+  "training_date": "2026-07-11 16:00:29",
+  "dataset_hash": "19c672f77aff85ea775d6fef36675e7b",
+  "expected_inputs": [
+    "square_feet",
+    "bedrooms",
+    "bathrooms",
+    "ad_spend_usd",
+    "impressions",
+    "clicks",
+    "ctr",
+    "cpc"
+  ],
+  "expected_outputs": [
+    "leads_converted"
+  ]
+}
