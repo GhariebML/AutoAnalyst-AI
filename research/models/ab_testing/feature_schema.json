@@ -1,0 +1,7 @@
+{
+  "input_types": {
+    "alpha": "list[float]",
+    "beta": "list[float]"
+  },
+  "actions": "arm_index"
+}
