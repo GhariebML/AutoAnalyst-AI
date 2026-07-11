@@ -1,0 +1,7 @@
+{
+  "feature_names": [
+    "brightness",
+    "contrast"
+  ],
+  "target": "aesthetic_score"
+}
