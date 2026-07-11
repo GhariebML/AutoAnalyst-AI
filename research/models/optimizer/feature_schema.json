@@ -1,0 +1,15 @@
+{
+  "state_features": [
+    "current_budget",
+    "remaining_budget",
+    "clicks",
+    "impressions",
+    "ctr",
+    "cpc",
+    "cpa",
+    "roas",
+    "conversions",
+    "duration"
+  ],
+  "action_dim": 2
+}
