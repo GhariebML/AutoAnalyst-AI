@@ -1,0 +1,6 @@
+{
+  "model_name": "E5_Base_V2_Embeddings",
+  "version": "1.0.0",
+  "vector_dimension": 768,
+  "training_date": "2026-07-11 16:36:38"
+}
