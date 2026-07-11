@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700">
+  <rect width="100%" height="100%" fill="#0A0A14" />
+  <text x="20" y="40" fill="#9CA3AF">Settings & Integrations</text>
+  <rect x="20" y="80" width="860" height="580" fill="#071018" stroke="#222" />
+  <text x="40" y="120" fill="#9CA3AF">OpenAI / SERPAPI / Cloudinary keys, Model selection</text>
+  <rect x="40" y="150" width="400" height="80" fill="#1F2937" rx="6"/>
+  <rect x="40" y="250" width="400" height="80" fill="#1F2937" rx="6"/>
+  <rect x="40" y="350" width="400" height="80" fill="#1F2937" rx="6"/>
+</svg>

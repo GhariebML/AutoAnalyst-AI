@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="100%" height="100%" fill="#0A0A14" />
+  <rect x="20" y="20" width="200" height="760" fill="#0D0D1A" stroke="#2A2A31" />
+  <text x="40" y="60" fill="#9CA3AF" font-size="18">Sidebar</text>
+
+  <rect x="240" y="20" width="920" height="80" fill="#0D0D1A" stroke="#2A2A31" />
+  <text x="260" y="62" fill="#9CA3AF" font-size="18">Topbar / Tabs</text>
+
+  <rect x="240" y="120" width="420" height="600" fill="#081018" stroke="#222" />
+  <text x="260" y="140" fill="#9CA3AF" font-size="16">Left Panel (Form / Pipeline)</text>
+
+  <rect x="680" y="120" width="480" height="600" fill="#071018" stroke="#222" />
+  <text x="700" y="140" fill="#9CA3AF" font-size="16">Main Content (Results / Preview)</text>
+
+  <g fill="#1F2937" opacity="0.6">
+    <rect x="700" y="180" width="200" height="110" rx="6"/>
+    <rect x="920" y="180" width="220" height="110" rx="6"/>
+    <rect x="700" y="300" width="440" height="180" rx="6"/>
+  </g>
+
+  <text x="700" y="170" fill="#6B7280" font-size="12">KPI Cards / Previews</text>
+</svg>

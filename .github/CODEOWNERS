@@ -1,0 +1,30 @@
+# Global ownership
+* @GhariebML
+
+# Schemas and core contracts
+/src/adpilot/schemas/ @GhariebML
+/src/adpilot/core/ @GhariebML
+/src/adpilot/orchestration/ @GhariebML
+
+# Agent ownership
+/src/adpilot/agents/strategy_agent.py @GhariebML
+/src/adpilot/agents/research_agent.py @Mo-Ghaith
+/src/adpilot/agents/content_agent.py @Sleem13
+/src/adpilot/agents/analytics_agent.py @mohamedkhaledmahmoud97-ux
+/src/adpilot/agents/design_agent.py @mohamedkarem20
+
+# Prompts ownership
+/src/adpilot/prompts/strategy_system_prompt.md @GhariebML
+/src/adpilot/prompts/research_system_prompt.md @Mo-Ghaith
+/src/adpilot/prompts/content_system_prompt.md @Sleem13
+/src/adpilot/prompts/analytics_system_prompt.md @mohamedkhaledmahmoud97-ux
+/src/adpilot/prompts/design_system_prompt.md @mohamedkarem20
+
+# Documentation
+/docs/ @GhariebML
+/README.md @GhariebML
+/CONTRIBUTING.md @GhariebML
+/SECURITY.md @GhariebML
+
+# CI and GitHub configuration
+/.github/ @GhariebML
