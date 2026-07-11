@@ -1,0 +1,8 @@
+{
+  "model_name": "Content_Score_Regressor_Ridge",
+  "version": "1.0.0",
+  "target_metric": "MAE",
+  "score": 2.3564362238011785,
+  "features_count": 50,
+  "training_date": "2026-07-11 16:21:33"
+}
