@@ -2,5 +2,5 @@
   "model_name": "RAG_Retrieval_Pipeline",
   "version": "1.0.0",
   "vector_store": "Qdrant",
-  "training_date": "2026-07-12 09:13:13"
+  "training_date": "2026-07-11 16:50:42"
 }

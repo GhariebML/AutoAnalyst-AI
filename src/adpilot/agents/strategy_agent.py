@@ -4,14 +4,10 @@ from __future__ import annotations
 
 import json
 
-import logging
 from langchain_core.prompts import ChatPromptTemplate
 
 from ..core.base_agent import BaseAgent
 from ..schemas.agent_schemas import CampaignContext, StrategyAgentInput, StrategyAgentOutput
-
-logger = logging.getLogger(__name__)
-
 
 
 class StrategyAgent(BaseAgent[StrategyAgentInput, StrategyAgentOutput]):
@@ -40,32 +36,8 @@ class StrategyAgent(BaseAgent[StrategyAgentInput, StrategyAgentOutput]):
             campaign_json=json.dumps(validated_input.campaign.model_dump(mode="json"), indent=2),
             campaign_id=context.campaign_id,
         )
-
-        # ML Model prediction step
-        try:
-            from ..services.model_loader import ModelLoader
-            import numpy as np
-            model = ModelLoader().load_model("models/strategy/strategy_model.pkl")
-            if model is not None:
-                # [age, balance, duration, campaign, pdays, previous, housing_enc, loan_enc, age_group_enc, job_enc, marital_enc]
-                duration_val = 300
-                if context.brief.duration:
-                    try:
-                        # Extract integer if possible
-                        duration_val = int("".join(filter(str.isdigit, context.brief.duration)))
-                    except Exception:
-                        pass
-                feat = np.array([[45, float(context.brief.budget or 10000.0), duration_val, 1, -1, 0, 1, 0, 1, 1, 1]])
-                propensity = int(model.predict(feat)[0])
-                logger.info("Strategy ML Model propensity prediction: %s", propensity)
-            else:
-                logger.info("Strategy ML Model loaded as None. Skipping prediction.")
-        except Exception as e:
-            logger.warning("Failed strategy model prediction: %s", str(e))
-
         context.strategy = output
         return context
-
 
     def build_prompt(self) -> ChatPromptTemplate:
         """Build the LangChain prompt template for strategy generation."""
