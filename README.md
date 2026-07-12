@@ -1,167 +1,215 @@
-# AutoAnalyst AI
-> Automated AI-Powered Data Analyst Platform
+# 📊 AutoAnalyst AI
+> **Enterprise-Grade Automated End-to-End Data Science & Machine Learning Pipeline**
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Platform](https://img.shields.io/badge/Platform-Enterprise_Analytics-darkblue)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square&logo=python)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/Framework-Streamlit-FF4B4B.svg?style=flat-square&logo=streamlit)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Quality Gate](https://img.shields.io/badge/Code%20Quality-Verified-success.svg?style=flat-square)](https://github.com/GhariebML/AutoAnalyst-AI)
 
-AutoAnalyst AI is an enterprise-grade automated data analyst platform designed to transform raw datasets into clean analytical structures, predictive machine learning models, statistical visualizations, and interactive business insights presented via a Streamlit dashboard.
+AutoAnalyst AI is a next-generation automated analytics engine designed to transform raw tabular datasets into professional analytical profiles, statistical visualizations, feature-engineered variables, predictive machine learning models, and actionable business insights. The entire workflow is presented through an interactive Streamlit executive dashboard.
 
 ---
 
-## 1. Core Vision & Ingestion Workflow
+## 🎯 Platform Core Architecture
 
-Our platform automates the end-to-end analytical lifecycle in a decoupled, sequential pipeline, ensuring predictable, testable, and reproducible data operations.
+Our architecture is strictly decoupled into modular package boundaries. The central execution lifecycle is orchestrated by a sequential pipeline, ensuring full reproducibility and auditability of data transformations.
 
 ```mermaid
-flowchart TD
-    A[Raw Dataset Upload] --> B[Data Loading]
-    B --> C[Schema & Type Profiling]
-    C --> D[EDA Statistics]
-    D --> E[Missing Imputers & Cleaner]
-    E --> F[Feature Engineering]
-    F --> G{Target Configured?}
-    G -- Yes --> H[ML Random Forest Fits]
-    H --> I[ML Model Evaluation]
-    I --> J[Insight Engine]
-    G -- No --> J[Insight Engine]
-    J --> K[Markdown Report Writer]
-    K --> L[Streamlit Interface Output]
+flowchart TB
+    subgraph Data Ingestion & Understanding
+        A[Raw CSV/XLSX Upload] --> B[Data Loader]
+        B --> C[Schema Validation & Profiling]
+    end
+
+    subgraph Exploratory Data Analysis
+        C --> D[Statistical Descriptives]
+        D --> E[Correlation Matrix & Visualizations]
+    end
+
+    subgraph Preprocessing & Feature Engineering
+        E --> F[Missing Value Imputation]
+        F --> G[Categorical Encoding & Outliers]
+        G --> H[Mathematical Feature Generation]
+    end
+
+    subgraph Modeling & Business Insights
+        H --> I{Target Variable?}
+        I -- Classification --> J[Random Forest Classifier]
+        I -- Regression --> K[Random Forest Regressor]
+        J & K --> L[Model Evaluation & Performance Metrics]
+        L --> M[AI Business Insight Engine]
+        M --> N[Streamlit Executive Dashboard]
+    end
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style N fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ---
 
-## 2. Release & Delivery Timeline
+## 📅 Project Release Timeline & Milestones
 
-The project follows a milestone-based delivery structure. The milestones for the final package release are as follows:
+The project is structured around key delivery milestones for our enterprise release package:
 
-| Milestone | Target Date | Status | Description |
+| Milestone | Target Date | Status | Objectives |
 | :--- | :--- | :--- | :--- |
-| **Project Kickoff** | 11 July 2026 | COMPLETED | System scope locked & codebase base package release. |
-| **Code Freeze** | 23 July 2026 | IN PROGRESS | Package implementation finalized; unit test freezes. |
-| **Integration Phase** | 24 July 2026 | PLANNED | Multi-team branch joins and orchestrator regressions. |
-| **Final Presentation** | 25 July 2026 | PLANNED | Production delivery release and live dashboard demo. |
+| **🚀 Project Kickoff** | July 11, 2026 | **Completed** | Scope definition, repository structure lock, and initial codebase setup. |
+| **❄️ Code Freeze** | July 23, 2026 | **In Progress** | Implementation freeze of all pipeline modules and unit test coverage checks. |
+| **🔄 Integration Phase** | July 24, 2026 | **Planned** | Merging feature branches, resolve dependency conflicts, and run regression tests. |
+| **📦 Final Release** | July 25, 2026 | **Planned** | Delivery of compiled PDF specifications, live presentation, and deployment. |
 
 ---
 
-## 3. Directory Layout
-
-The codebase has been restructured into clean package boundaries and enterprise documentation paths:
+## 📂 Repository Structure
 
 ```text
 AutoAnalyst-AI/
-├── app/                        # Streamlit dashboard application
+├── app/                        # Streamlit dashboard interface
 │   └── streamlit_app.py        # Dashboard entry point
-├── data/                       # Ingestion datasets storage
-│   ├── raw/
-│   ├── processed/
-│   └── sample/                 # Test files (e.g. example.csv)
-├── docs/                       # Technical specs and handbooks
-│   ├── Teams/                  # Team-specific spec folders
+├── data/                       # Local dataset ingestion storage
+│   ├── raw/                    # Raw credit risk & tabular uploads
+│   ├── processed/              # Intermediary clean pipeline outputs
+│   └── sample/                 # Verification files (example.csv)
+├── docs/                       # Corporate handbooks and team specifications
+│   ├── Teams/                  # Team specification folders
 │   │   ├── 01-Team-Project-Management/
 │   │   ├── 02-Team-Data-Profiling/
-│   │   ├── ...
+│   │   ├── 03-Team-EDA/
+│   │   ├── 04-Team-Preprocessing/
+│   │   ├── 05-Team-Modeling/
+│   │   ├── 06-Team-Evaluation/
 │   │   └── 07-Team-Dashboard/
 │   └── PDF/                    # 13 Compiled enterprise PDFs
-├── src/autoanalyst/            # Core Python package modules
-│   ├── data_loading/
-│   ├── data_profiling/
-│   ├── eda/
-│   ├── preprocessing/
-│   ├── feature_engineering/
-│   ├── modeling/
-│   ├── evaluation/
-│   ├── insights/
-│   ├── reporting/
-│   ├── utils/
-│   └── pipeline.py             # Orchestrator core
-├── tests/                      # Automated test code suites
-├── pyproject.toml              # Build & packaging parameters
-└── README.md                   # Platform overview
+├── src/autoanalyst/            # Core Python package codebase
+│   ├── data_loading/           # CSV/XLSX loaders and schema checks
+│   ├── data_profiling/         # Missing pattern counters & types
+│   ├── eda/                    # Correlation & descriptive statistics
+│   ├── preprocessing/          # Null imputers & categorical encoders
+│   ├── feature_engineering/    # Polynomial/ratio feature generator
+│   ├── modeling/               # RF Classifier & Regressor training
+│   ├── evaluation/             # Metrics calculator (F1, RMSE, R²)
+│   ├── insights/               # Automated recommendation generator
+│   ├── reporting/              # Markdown report compiler
+│   ├── utils/                  # Shared helper scripts
+│   └── pipeline.py             # Central orchestrator wrapper
+├── tests/                      # Pytest automated test suites
+├── pyproject.toml              # Build & dependency packaging
+└── README.md                   # Platform documentation
 ```
 
 ---
 
-## 4. Technical Delivery Packages & Documentation
+## 📄 Compiled Enterprise Specifications (PDFs)
 
-All technical specifications, workflows, and handbooks are fully documented. The compiled PDF versions are available under [docs/PDF/](docs/PDF/):
+We have compiled exactly **13 enterprise-grade PDF handbooks** inside the [docs/PDF/](docs/PDF/) directory to guide developers and project leads:
 
-### Team-Specific Packages
-1. **[01-Team-Project-Management.pdf](docs/PDF/01-Team-Project-Management.pdf)**: Project managers & integration guidelines.
-2. **[02-Team-Data-Profiling.pdf](docs/PDF/02-Team-Data-Profiling.pdf)**: CSV/Excel readers, schema validators.
-3. **[03-Team-EDA.pdf](docs/PDF/03-Team-EDA.pdf)**: Numeric descriptive summaries & correlations.
-4. **[04-Team-Preprocessing.pdf](docs/PDF/04-Team-Preprocessing.pdf)**: Missing value imputations & categorical encoders.
-5. **[05-Team-Modeling.pdf](docs/PDF/05-Team-Modeling.pdf)**: RandomForest classifier and regressor wrappers.
-6. **[06-Team-Evaluation.pdf](docs/PDF/06-Team-Evaluation.pdf)**: ML evaluation and business insights engines.
-7. **[07-Team-Dashboard.pdf](docs/PDF/07-Team-Dashboard.pdf)**: Streamlit UI and markdown exporter.
+### Team Guides & Responsibilities
+1. 📂 **[01-Team-Project-Management.pdf](docs/PDF/01-Team-Project-Management.pdf)**: Project workflow coordination and release schedules.
+2. 🔬 **[02-Team-Data-Profiling.pdf](docs/PDF/02-Team-Data-Profiling.pdf)**: Ingestion requirements, validation parameters, and type parsing.
+3. 📈 **[03-Team-EDA.pdf](docs/PDF/03-Team-EDA.pdf)**: Data visualizations, distributions, and correlation maps.
+4. ⚙️ **[04-Team-Preprocessing.pdf](docs/PDF/04-Team-Preprocessing.pdf)**: Imputation strategies, outlier rules, and categorical encoding.
+5. 🤖 **[05-Team-Modeling.pdf](docs/PDF/05-Team-Modeling.pdf)**: Random Forest modeling architectures and hyperparameter specs.
+6. 📊 **[06-Team-Evaluation.pdf](docs/PDF/06-Team-Evaluation.pdf)**: Core ML validation metrics and business recommendation engines.
+7. 🖥️ **[07-Team-Dashboard.pdf](docs/PDF/07-Team-Dashboard.pdf)**: Streamlit UI components, session state, and export tools.
 
-### Core Handbooks & System Guides
-- **[Project-Handbook.pdf](docs/PDF/Project-Handbook.pdf)**: Team structure, kickoff parameters, and roles.
-- **[Developer-Handbook.pdf](docs/PDF/Developer-Handbook.pdf)**: Local environment activation & quality standards.
-- **[Architecture.pdf](docs/PDF/Architecture.pdf)**: Decoupled package boundaries and sequential pipeline design.
-- **[Integration-Guide.pdf](docs/PDF/Integration-Guide.pdf)**: Merge guidelines, verification rules, and branch reviews.
-- **[Deployment-Guide.pdf](docs/PDF/Deployment-Guide.pdf)**: Streamlit dashboard activation, local running, and Docker builds.
-- **[Git-Workflow.pdf](docs/PDF/Git-Workflow.pdf)**: Git commit prefixes and pull request requirements.
+### Central Project Architecture & Onboarding Handbooks
+* 📘 **[Project-Handbook.pdf](docs/PDF/Project-Handbook.pdf)**: Organizational team leads, roadmap, and contact lists.
+* 💻 **[Developer-Handbook.pdf](docs/PDF/Developer-Handbook.pdf)**: Development environment instructions and code review policies.
+* 🏗️ **[Architecture.pdf](docs/PDF/Architecture.pdf)**: In-depth package boundary maps and data payload flows.
+* 🧩 **[Integration-Guide.pdf](docs/PDF/Integration-Guide.pdf)**: Module interfaces, regression safety, and PR integration protocols.
+* 🚀 **[Deployment-Guide.pdf](docs/PDF/Deployment-Guide.pdf)**: Streamlit hosting guides, Docker configurations, and containerization.
+* 🐙 **[Git-Workflow.pdf](docs/PDF/Git-Workflow.pdf)**: Branch naming rules, semantic commit standards, and PR template guidelines.
 
 ---
 
-## 5. Developer Guide & Setup
+## 💻 Developer Setup & Running Guide
 
-### Installation
-Clone the repository and set up a virtual environment:
+### 1. Prerequisites
+Ensure you have **Python 3.10+** installed on your system.
 
+### 2. Installation
+Clone the repository and set up a clean Python virtual environment:
 ```bash
 git clone https://github.com/GhariebML/AutoAnalyst-AI.git
 cd AutoAnalyst-AI
 python -m venv .venv
 ```
 
-Activate the environment (Windows PowerShell):
-```powershell
-.venv\Scripts\Activate.ps1
-```
+Activate the environment:
+* **Windows (PowerShell)**:
+  ```powershell
+  .venv\Scripts\Activate.ps1
+  ```
+* **macOS / Linux (Git Bash)**:
+  ```bash
+  source .venv/bin/activate
+  ```
 
-Activate the environment (Git Bash / Linux / macOS):
-```bash
-source .venv/bin/activate
-```
-
-Install requirements and the editable package:
+Install requirements and configure the project in editable mode:
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-### Run the Dashboard
-Run the Streamlit interactive dashboard:
+### 3. Running the Streamlit Dashboard
+Launch the dashboard interface locally:
 ```bash
 streamlit run app/streamlit_app.py
 ```
 
-### Running Test Suites
-Validate the codebase using `pytest`:
+### 4. Running the Test Suite
+Ensure code stability by executing our automated regression tests:
 ```bash
 pytest
 ```
 
 ---
 
-## 6. Contributing & Branch Policies
+## 🐙 Git Flow & Branch Policies
 
-To ensure stability, developers must check code freeze dates and use the proper git flow:
-- All developers work on their designated `feature/` branch (e.g. `feature/data-profiling`).
-- Pushing code directly to the `develop` or `main` branches is blocked.
-- Commit logs must follow semantic prefixes: `feat:`, `fix:`, `docs:`, `test:`, or `refactor:`.
-- Create Pull Requests targeting `develop`. The PR must be reviewed and approved by Team 1.
+To maintain the stability of our core releases, the repository enforces a structured Git Flow:
+
+* **Branch Rules**:
+  * Pushing directly to `main` or `develop` branches is strictly blocked.
+  * All active feature modifications must occur on dedicated sub-team branches (e.g., `feature/data-profiling`).
+  * Pull requests must target the `develop` branch and require approval from the **Project Management (Team 1)** team.
+
+* **Commit Message Format**:
+  Commit messages must follow semantic conventions:
+  * `feat: ...` for new functional pipeline blocks.
+  * `fix: ...` for resolving pipeline bugs.
+  * `docs: ...` for documentation updates.
+  * `test: ...` for adding verification tests.
 
 ---
 
-## 7. Contributors & Team Leads
+## 👥 Contributors & Core Organization
 
-- **PM & Systems Integration**: Mohamed Gharieb, Mohamed Abd Elkhalek
-- **Data Profiling Engine**: Aya Emad, Aya Mostafa
-- **EDA Engine**: Mohamed Kamal, Yomna Ashraf, Samar Mahmoud
-- **Preprocessing Engine**: Basma Mansour, Bothaina Elqady
-- **Machine Learning Engine**: Mohamed Khaled El-Shayp, Ahmed Gamal
-- **Evaluation & Insights Engine**: Youssef Al-komi, Sohad Abd El-Mohsen
-- **Dashboard & Reporting**: Hazem, Mahmoud Maher
+* **Team 1: PM & Systems Integration**  
+  * Mohamed Gharieb (Lead)  
+  * Mohamed Abd Elkhalek  
+
+* **Team 2: Data Profiling Engine**  
+  * Aya Emad (Lead)  
+  * Aya Mostafa  
+
+* **Team 3: EDA & Visualization**  
+  * Mohamed Kamal (Lead)  
+  * Yomna Ashraf  
+  * Samar Mahmoud  
+
+* **Team 4: Preprocessing & Feature Engineering**  
+  * Basma Mansour (Lead)  
+  * Bothaina Elqady  
+
+* **Team 5: Machine Learning Engine**  
+  * Mohamed Khaled El-Shayp (Lead)  
+  * Ahmed Gamal  
+
+* **Team 6: Evaluation & Insights**  
+  * Youssef Al-komi (Lead)  
+  * Sohad Abd El-Mohsen  
+
+* **Team 7: Dashboard & Reporting**  
+  * Hazem (Lead)  
+  * Mahmoud Maher  
