@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import json
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,6 +11,9 @@ from ..core.base_agent import BaseAgent
 from ..schemas.agent_schemas import (
     CampaignContext, AnalyticsAgentInput, AnalyticsAgentOutput, ResearchAgentOutput, CompetitorAnalysis, PositiveFloat
 )
+
+logger = logging.getLogger(__name__)
+
 
 
 class AnalyticsAgent(BaseAgent[AnalyticsAgentInput, AnalyticsAgentOutput]):
@@ -70,8 +74,25 @@ class AnalyticsAgent(BaseAgent[AnalyticsAgentInput, AnalyticsAgentOutput]):
             content_json=json.dumps(validated_input.content.model_dump(mode="json"), indent=2),
             campaign_id=context.campaign_id,
         )
+
+        # ML Model prediction step
+        try:
+            from ..services.model_loader import ModelLoader
+            import numpy as np
+            model = ModelLoader().load_model("research/models/analytics/analytics_model.pkl")
+            if model is not None:
+                # [age, balance, duration, campaign, previous, bal_dur_ratio, campaign_efficiency]
+                feat = np.array([[45, 10000.0, 300, 2, 1, 10000.0/301.0, 300*2]])
+                roas_val = float(model.predict(feat)[0])
+                logger.info("Analytics ML Model ROAS prediction: %s", roas_val)
+            else:
+                logger.info("Analytics ML Model files loaded as None. Skipping prediction.")
+        except Exception as e:
+            logger.warning("Failed analytics model prediction: %s", str(e))
+
         context.analytics = output
         return context
+
 
     def build_prompt(self) -> ChatPromptTemplate:
         """Build the LangChain prompt template for analytics generation."""

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import json
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,6 +11,9 @@ from ..core.base_agent import BaseAgent
 from ..schemas.agent_schemas import (
     CampaignContext, ContentAgentInput, ContentAgentOutput, ResearchAgentOutput, CompetitorAnalysis, PositiveFloat
 )
+
+logger = logging.getLogger(__name__)
+
 
 
 class ContentAgent(BaseAgent[ContentAgentInput, ContentAgentOutput]):
@@ -74,8 +78,30 @@ class ContentAgent(BaseAgent[ContentAgentInput, ContentAgentOutput]):
             retry_guidance=retry_guidance or "None.",
             campaign_id=context.campaign_id,
         )
+
+        # ML Model prediction step
+        try:
+            from ..services.model_loader import ModelLoader
+            model = ModelLoader().load_model("research/models/content/content_model.pkl")
+            tokenizer = ModelLoader().load_model("research/models/content/tokenizer.pkl")
+            if model is not None and tokenizer is not None:
+                headline_text = ""
+                if output.ads and len(output.ads) > 0:
+                    headline_text = output.ads[0].headline or ""
+                elif output.social_posts and len(output.social_posts) > 0:
+                    headline_text = output.social_posts[0].content or ""
+                if headline_text:
+                    feat = tokenizer.transform([headline_text])
+                    score = float(model.predict(feat)[0])
+                    logger.info("Content ML Model headline quality prediction: %s", score)
+            else:
+                logger.info("Content ML Model files loaded as None. Skipping prediction.")
+        except Exception as e:
+            logger.warning("Failed content model prediction: %s", str(e))
+
         context.content = output
         return context
+
 
     def build_prompt(self) -> ChatPromptTemplate:
         """Build the LangChain prompt template for content generation."""
