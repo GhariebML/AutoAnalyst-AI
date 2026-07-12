@@ -1,32 +1,32 @@
 [
   {
     "Model Name": "Strategy",
-    "Avg Latency (ms)": 2.1838190000198665,
+    "Avg Latency (ms)": 4.167944000073476,
     "Size (KB)": 5726.91015625
   },
   {
     "Model Name": "Research",
-    "Avg Latency (ms)": 0.027456000025267713,
+    "Avg Latency (ms)": 0.06597400002647191,
     "Size (KB)": 3.7080078125
   },
   {
     "Model Name": "Content",
-    "Avg Latency (ms)": 0.023533999992650934,
+    "Avg Latency (ms)": 0.050608000019565225,
     "Size (KB)": 0.85546875
   },
   {
     "Model Name": "Design",
-    "Avg Latency (ms)": 0.022817000026407186,
+    "Avg Latency (ms)": 0.050722000014502555,
     "Size (KB)": 0.48046875
   },
   {
     "Model Name": "Analytics",
-    "Avg Latency (ms)": 0.039892000022518914,
+    "Avg Latency (ms)": 0.09539199993014336,
     "Size (KB)": 0.7197265625
   },
   {
     "Model Name": "CV",
-    "Avg Latency (ms)": 0.028133999985584524,
+    "Avg Latency (ms)": 0.05387999990489334,
     "Size (KB)": 0.48046875
   }
 ]
