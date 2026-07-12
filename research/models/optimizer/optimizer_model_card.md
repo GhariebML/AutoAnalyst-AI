@@ -2,6 +2,6 @@
 
 * **Architecture**: REINFORCE Policy Gradient Network
 * **Dataset**: iPinYou RTB Bidding simulations
-* **Metrics**: Mean Stress Reward 3.2664
+* **Metrics**: Mean Stress Reward 3.2651
 * **Limitations**: Continuous observation and continuous action spaces.
 * **Training Date**: 2026-07-11

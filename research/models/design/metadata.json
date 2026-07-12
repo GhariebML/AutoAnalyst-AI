@@ -1,6 +1,6 @@
 {
   "model_name": "Design_Aesthetic_Regressor_Ridge",
   "version": "1.0.0",
-  "accuracy": -0.0030811070726364242,
-  "training_date": "2026-07-11 16:30:24"
+  "accuracy": 0.03934034273452913,
+  "training_date": "2026-07-11 16:50:13"
 }

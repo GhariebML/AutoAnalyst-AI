@@ -1,6 +1,6 @@
 {
   "model_name": "CV_Aesthetic_Regressor_Ridge",
   "version": "1.0.0",
-  "mae": 0.12563075539717983,
-  "training_date": "2026-07-11 16:35:09"
+  "mae": 0.12578176660412405,
+  "training_date": "2026-07-11 16:50:35"
 }
