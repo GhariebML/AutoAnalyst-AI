@@ -1,63 +1,40 @@
-# Environment
-.env
-.env.*
-!.env.example
-!frontend/.env.example
-.venv
-venv/
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
+*.egg-info/
 build/
 dist/
-*.egg-info/
-*.egg
-
-# Testing
 .pytest_cache/
-.ruff_cache/
-.coverage
-htmlcov/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Local assistant/tool backups
+.openclaw-backups/
 
-# Data outputs
-data/outputs/*
-!data/outputs/.gitkeep
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data and reports
+/data/raw/*
+/data/processed/*
+!/data/raw/.gitkeep
+!/data/processed/.gitkeep
+*.parquet
+*.sqlite
 *.db
 
-# Frontend dependencies/build outputs
-node_modules/
-frontend/node_modules/
-frontend/dist/
-frontend/build/
+# Jupyter
+.ipynb_checkpoints/
 
-# Logs
-*.log
-.local-logs/
+# IDEs
+.vscode/
+.idea/
 
-# Local OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# Typings & Caches
-.mypy_cache/
-
-# Local Database Stores & Vector Indexes
-storage/
-data/chromadb/
-data/test_qdrant/
-data/uploads/
-e2e_test_output.json
-mlruns/
-mlflow.db
-
-
+# Environment variables
+.env
+.env.*

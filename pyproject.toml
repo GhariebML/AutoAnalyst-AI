@@ -1,55 +1,19 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "adpilot"
+name = "autoanalyst-ai"
 version = "0.1.0"
-description = "AI-Powered Autonomous Marketing Agency"
+description = "Automated AI-powered data analyst system starter project."
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "pydantic>=2.0",
-    "pydantic-settings",
-    "python-dotenv",
-    "openai",
-    "langchain",
-    "langchain-core",
-    "langchain-openai",
-    "httpx",
-    "tenacity",
-    "fastapi>=0.136.1",
-    "uvicorn[standard]>=0.47.0",
-    "sqlalchemy[asyncio]>=2.0",
-    "aiosqlite",
-    "slowapi",
-    "arq>=0.28.0",
-    "redis>=5.3.1",
-    "structlog>=26.1.0",
-    "qdrant-client",
-    "langchain-qdrant",
-    "fastembed",
-]
+requires-python = ">=3.10"
+authors = [{ name = "AutoAnalyst AI Contributors" }]
+license = { text = "MIT" }
 
-[project.optional-dependencies]
-dev = [
-    "pytest",
-    "pytest-asyncio",
-    "ruff",
-    "black",
-    "mypy"
-]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-
-[tool.ruff]
-line-length = 120
-
-[tool.black]
-line-length = 120
-
-[tool.mypy]
-python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
+testpaths = ["tests"]

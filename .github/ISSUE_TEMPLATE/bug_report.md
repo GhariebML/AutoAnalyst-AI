@@ -1,32 +1,39 @@
 ---
-name: Bug Report
-about: Report a bug in the codebase
-title: "[BUG] <short description>"
+name: Bug report
+about: Report something that is not working correctly
+title: "[Bug]: "
 labels: bug
 assignees: ""
 ---
 
-**Problem**
-A clear description of what the bug is.
+## Bug Summary
 
-**Steps to Reproduce**
-1. 
-2. 
-3. 
+Describe the problem in 1-2 sentences.
 
-**Expected Behavior**
-What should happen.
+## Steps to Reproduce
 
-**Actual Behavior**
-What happens instead.
+1.
+2.
+3.
 
-**Screenshots / Logs**
-Paste relevant logs or error messages.
+## Expected Behavior
 
-**Environment**
-- OS: [e.g., Windows 10, macOS]
-- Python version: [e.g., 3.12]
-- Branch: [e.g., feature/research-agent]
+What did you expect to happen?
 
-**Additional Context**
-Any other context about the problem.
+## Actual Behavior
+
+What actually happened?
+
+## Error Message or Screenshot
+
+Paste the error message or add a screenshot if useful.
+
+## Environment
+
+- Operating system:
+- Python version:
+- Branch name:
+
+## Additional Notes
+
+Add any other context here.

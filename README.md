@@ -1,277 +1,167 @@
-# ADPilot Pro
+# AutoAnalyst AI
+> Automated AI-Powered Data Analyst Platform
 
-**Enterprise-Grade Autonomous Marketing Agency Powered by Multi-Agent AI Systems.**
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Platform](https://img.shields.io/badge/Platform-Enterprise_Analytics-darkblue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-ADPilot Pro turns structured marketing campaign briefs into complete, launch-ready packages. By coordinating **11 specialized AI agents** (covering strategy, market research, competitor analysis, copywriting, analytics feedback, design concepting, and budget scheduling), it delivers comprehensive, consistent, and validated campaigns in seconds.
-
-The system utilizes Pydantic schemas as a single source of truth for contracts, and is built on FastAPI and React. It features a self-correcting multi-agent execution cycle where an evaluation agent scores content quality and feeds back recommendations to optimize the copy autonomously.
-
----
-
-## Technical Badges & Ecosystem
-
-![Python Version](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-![Pydantic](https://img.shields.io/badge/Pydantic-v2-purple?logo=pydantic&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3-38B2AC?logo=tailwindcss&logoColor=white)
-![Code Style](https://img.shields.io/badge/Code%20Style-Ruff-black?logo=python&logoColor=white)
-![License](https://img.shields.io/github/license/GhariebML/ADPilot-Pro?color=orange)
+AutoAnalyst AI is an enterprise-grade automated data analyst platform designed to transform raw datasets into clean analytical structures, predictive machine learning models, statistical visualizations, and interactive business insights presented via a Streamlit dashboard.
 
 ---
 
-## 🏗️ System Architecture
+## 1. Core Vision & Ingestion Workflow
 
-ADPilot Pro is divided into a fast FastAPI backend, a background worker runner powered by Redis, and a modern React client. The agents use a shared memory context to load and save execution states seamlessly.
-
-```mermaid
-graph TD
-    Client[React/Vite Dashboard] <-->|HTTP / Axios| API[FastAPI Web Server]
-    API <-->|Enqueue / Poll| Worker[Arq Background Worker]
-    Worker <-->|Orchestrate| TaskMgr[TaskManager DAG]
-    TaskMgr <-->|Stateless Runs| AgentPipeline[Agent Pipeline]
-    
-    subgraph Services & DBs
-        TaskMgr <-->|Context State| MemService[MemoryService]
-        MemService <-->|In-Memory Store| Redis[Redis Cache]
-        API <-->|Query Campaign History| SQLite[(SQLite adpilot.db)]
-        AgentPipeline <-->|Query Vector Context| Qdrant[(Qdrant Vector DB)]
-        AgentPipeline <-->|Fallback Vector Context| Chroma[(ChromaDB)]
-    end
-    
-    subgraph External LLM Providers
-        AgentPipeline -->|API Calls| OpenAI[OpenAI API]
-        AgentPipeline -->|API Calls| OpenRouter[OpenRouter Gateway]
-        AgentPipeline -->|API Calls| Claude[Anthropic API]
-        AgentPipeline -->|API Calls| HF[Hugging Face API]
-        AgentPipeline -->|API Calls| Ollama[Local Ollama]
-    end
-```
-
----
-
-## 🔄 Self-Correcting Quality Gate Loop
-
-The core innovation of ADPilot Pro is the integration of a **Quality Gate** evaluation stage. Rather than executing a simple linear sequence, the system runs a cyclic optimization loop to guarantee that marketing copy meets quality and policy requirements before design and budget allocation are initiated:
+Our platform automates the end-to-end analytical lifecycle in a decoupled, sequential pipeline, ensuring predictable, testable, and reproducible data operations.
 
 ```mermaid
 flowchart TD
-    Start([Campaign Brief Input]) --> Strategy[Strategy Agent]
-    Start --> Research[Research Agent]
-    
-    Strategy --> Content[Content Agent]
-    Research --> Content
-    
-    Content --> Analytics[Analytics Agent]
-    
-    subgraph Quality Gate Loop
-        Analytics --> ScoreCheck{Health Score >= 70?}
-        ScoreCheck -- No (Retry < 3) --> ExtractHints[Extract Optimization Hints]
-        ExtractHints -->|Feedback Loop| Content
-        ScoreCheck -- No (Retry >= 3) --> GateFail[Mark 'Requires Review']
-    end
-    
-    ScoreCheck -- Yes --> Design[Design Agent]
-    GateFail --> Design
-    
-    Design --> CampaignMgr[Campaign Manager Agent]
-    CampaignMgr --> Output([Orchestrator Output Package])
+    A[Raw Dataset Upload] --> B[Data Loading]
+    B --> C[Schema & Type Profiling]
+    C --> D[EDA Statistics]
+    D --> E[Missing Imputers & Cleaner]
+    E --> F[Feature Engineering]
+    F --> G{Target Configured?}
+    G -- Yes --> H[ML Random Forest Fits]
+    H --> I[ML Model Evaluation]
+    I --> J[Insight Engine]
+    G -- No --> J[Insight Engine]
+    J --> K[Markdown Report Writer]
+    K --> L[Streamlit Interface Output]
 ```
 
-1. **Content & Analytics Loop**: The `ContentAgent` generates copy, which is immediately scored by `AnalyticsAgent` against alignment, tone of voice, formatting limits, and brand guidelines.
-2. **Feedback Routing**: If the score is below 70, the orchestrator extracts concrete recommendations (e.g. "Headline is too long", "Tone is too salesy") and sends them back to `ContentAgent` for a retry.
-3. **Execution Cap**: The loop runs up to 3 times. If it fails to reach the quality threshold, it bypasses final design generation and reports `REQUIRES REVIEW` to protect API costs and avoid bad output.
-
 ---
 
-## 🤖 Specialized Agent Registry
+## 2. Release & Delivery Timeline
 
-ADPilot Pro coordinates **11 autonomous agents**, each assigned to a single domain of campaign creation:
+The project follows a milestone-based delivery structure. The milestones for the final package release are as follows:
 
-| Agent Name | Description | Key Inputs | Key Outputs / Deliverables |
+| Milestone | Target Date | Status | Description |
 | :--- | :--- | :--- | :--- |
-| **StrategyAgent** | Creates positioning statements, chooses core channels, and sets marketing themes. | `CampaignInput` | `StrategyAgentOutput` (Funnel stages, positioning) |
-| **ResearchAgent** | Conducts synthetic target audience profiling and market trend analyses. | `CampaignInput` | `ResearchAgentOutput` (Persona profiles, industry insights) |
-| **CompetitorAgent** | Inspects market competitors and suggests points of differentiation. | `CampaignInput` | Competitor analysis matrix and gaps |
-| **AudienceAgent** | Segment audiences and maps key pain points to product benefits. | `CampaignInput` | Demographic & psychographic target profiles |
-| **ContentAgent** | Drafts text assets, including ads, social posts, and email sequences. | `Strategy`, `Research`, Hints | `ContentAgentOutput` (Ads, email sequences, posts) |
-| **AnalyticsAgent** | Scores content quality and verifies compliance with safety policies. | Generated Content | `AnalyticsAgentOutput` (Health score, retry hints) |
-| **CreativeAgent** | Outlines design direction, color guides, and asset visual concepts. | `Strategy`, `Content` | Visual moodboards, styling directions |
-| **DesignAgent** | Formulates precise text-to-image prompts (e.g., DALL-E) for ad graphics. | `Strategy`, `Content` | `DesignAgentOutput` (Image prompts, brand rules) |
-| **OptimizationAgent** | Adapts copy and target parameters dynamically based on incoming feedback. | Campaign results | Copy adjustments and targeting fine-tunes |
-| **PublishingAgent** | Sets distribution channels and content publication schedules. | Content package | Ad placement schedules |
-| **CampaignManagerAgent**| Computes budget allocations, drafts A/B test plans, and sets targets. | Complete Context | `CampaignManagerOutput` (Budget split, A/B test outline) |
+| **Project Kickoff** | 11 July 2026 | COMPLETED | System scope locked & codebase base package release. |
+| **Code Freeze** | 23 July 2026 | IN PROGRESS | Package implementation finalized; unit test freezes. |
+| **Integration Phase** | 24 July 2026 | PLANNED | Multi-team branch joins and orchestrator regressions. |
+| **Final Presentation** | 25 July 2026 | PLANNED | Production delivery release and live dashboard demo. |
 
 ---
 
-## 📂 Project Structure
+## 3. Directory Layout
+
+The codebase has been restructured into clean package boundaries and enterprise documentation paths:
 
 ```text
-ADPilot-Pro/
-├── .github/                 # CI/CD Workflows, pull request and issue templates
-├── src/adpilot/             # Core Python package
-│   ├── agents/              # Specialized AI Agent modules
-│   ├── api/                 # FastAPI router layer and endpoint handlers
-│   ├── core/                # Config files, BaseAgent class, custom exceptions
-│   ├── memory/              # Memory storage classes for agents
-│   ├── models/              # Internal database/ORM models
-│   ├── orchestration/       # TaskManager DAG and orchestrator runner
-│   ├── prompts/             # System templates and instruction sets
-│   ├── providers/           # Provider-specific adapter models
-│   ├── schemas/             # Pydantic v2 schemas (Source of Truth)
-│   ├── services/            # Database operations, client calls, memory management
-│   └── utils/               # Logs configuration and helper utilities
-├── frontend/                # React / TypeScript / Vite Dashboard
-│   ├── public/              # Static assets
-│   ├── src/                 # Client UI source code (components, hooks, state)
-│   └── package.json         # Frontend dependencies and configuration
-├── data/                    # Local storage structures
-│   ├── samples/             # Raw JSON payloads for schema testing
-│   └── outputs/             # Campaign run output folder
-├── docs/                    # Architectural documents and setups
-├── scripts/                 # CLI runner utilities for local testing
-├── tests/                   # Pytest test suites (backend & integration)
-├── Dockerfile               # Backend container configuration
-├── docker-compose.yml       # Multi-container orchestration (FastAPI + Redis)
-├── pyproject.toml           # Python configuration (ruff, pytest)
-├── uv.lock                  # Python package locking (uv manager)
-└── requirements.txt         # Production runtime dependencies
+AutoAnalyst-AI/
+├── app/                        # Streamlit dashboard application
+│   └── streamlit_app.py        # Dashboard entry point
+├── data/                       # Ingestion datasets storage
+│   ├── raw/
+│   ├── processed/
+│   └── sample/                 # Test files (e.g. example.csv)
+├── docs/                       # Technical specs and handbooks
+│   ├── Teams/                  # Team-specific spec folders
+│   │   ├── 01-Team-Project-Management/
+│   │   ├── 02-Team-Data-Profiling/
+│   │   ├── ...
+│   │   └── 07-Team-Dashboard/
+│   └── PDF/                    # 13 Compiled enterprise PDFs
+├── src/autoanalyst/            # Core Python package modules
+│   ├── data_loading/
+│   ├── data_profiling/
+│   ├── eda/
+│   ├── preprocessing/
+│   ├── feature_engineering/
+│   ├── modeling/
+│   ├── evaluation/
+│   ├── insights/
+│   ├── reporting/
+│   ├── utils/
+│   └── pipeline.py             # Orchestrator core
+├── tests/                      # Automated test code suites
+├── pyproject.toml              # Build & packaging parameters
+└── README.md                   # Platform overview
 ```
 
 ---
 
-## ⚡ Quick Start
+## 4. Technical Delivery Packages & Documentation
 
-### Prerequisites
+All technical specifications, workflows, and handbooks are fully documented. The compiled PDF versions are available under [docs/PDF/](docs/PDF/):
 
-- **Python:** Version 3.12 or higher.
-- **NodeJS:** Version 20 or higher (for the frontend).
-- **Redis:** Running locally or accessible via URL (for the worker queue).
+### Team-Specific Packages
+1. **[01-Team-Project-Management.pdf](docs/PDF/01-Team-Project-Management.pdf)**: Project managers & integration guidelines.
+2. **[02-Team-Data-Profiling.pdf](docs/PDF/02-Team-Data-Profiling.pdf)**: CSV/Excel readers, schema validators.
+3. **[03-Team-EDA.pdf](docs/PDF/03-Team-EDA.pdf)**: Numeric descriptive summaries & correlations.
+4. **[04-Team-Preprocessing.pdf](docs/PDF/04-Team-Preprocessing.pdf)**: Missing value imputations & categorical encoders.
+5. **[05-Team-Modeling.pdf](docs/PDF/05-Team-Modeling.pdf)**: RandomForest classifier and regressor wrappers.
+6. **[06-Team-Evaluation.pdf](docs/PDF/06-Team-Evaluation.pdf)**: ML evaluation and business insights engines.
+7. **[07-Team-Dashboard.pdf](docs/PDF/07-Team-Dashboard.pdf)**: Streamlit UI and markdown exporter.
 
----
-
-### Backend Setup
-
-1. **Clone and enter the repository:**
-   ```powershell
-   git clone https://github.com/GhariebML/ADPilot-Pro.git
-   cd ADPilot-Pro
-   ```
-
-2. **Create and activate a virtual environment:**
-   *Using standard venv:*
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
-   *Or using `uv` (recommended for faster package resolutions):*
-   ```powershell
-   uv venv
-   .\.venv\Scripts\Activate.ps1
-   ```
-
-3. **Install dependencies:**
-   ```powershell
-   pip install -r requirements.txt
-   pip install -r requirements-dev.txt
-   ```
-
-4. **Set up environment variables:**
-   Copy the example environment template:
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-   Fill in your configuration settings (see [Environment Variables](#-environment-variables)).
-
-5. **Start the FastAPI application server:**
-   ```powershell
-   $env:PYTHONPATH="src"
-   python -m uvicorn adpilot.api.main:app --host 127.0.0.1 --port 8000 --reload
-   ```
-   - Swagger Documentation: `http://127.0.0.1:8000/docs`
-   - Health endpoint: `http://127.0.0.1:8000/healthz`
-
-6. **Start the background task worker (arq):**
-   ```powershell
-   $env:PYTHONPATH="src"
-   arq adpilot.worker.WorkerSettings
-   ```
+### Core Handbooks & System Guides
+- **[Project-Handbook.pdf](docs/PDF/Project-Handbook.pdf)**: Team structure, kickoff parameters, and roles.
+- **[Developer-Handbook.pdf](docs/PDF/Developer-Handbook.pdf)**: Local environment activation & quality standards.
+- **[Architecture.pdf](docs/PDF/Architecture.pdf)**: Decoupled package boundaries and sequential pipeline design.
+- **[Integration-Guide.pdf](docs/PDF/Integration-Guide.pdf)**: Merge guidelines, verification rules, and branch reviews.
+- **[Deployment-Guide.pdf](docs/PDF/Deployment-Guide.pdf)**: Streamlit dashboard activation, local running, and Docker builds.
+- **[Git-Workflow.pdf](docs/PDF/Git-Workflow.pdf)**: Git commit prefixes and pull request requirements.
 
 ---
 
-### Frontend Setup
+## 5. Developer Guide & Setup
 
-1. **Navigate to the frontend folder:**
-   ```powershell
-   cd frontend
-   ```
+### Installation
+Clone the repository and set up a virtual environment:
 
-2. **Install Node packages:**
-   ```powershell
-   npm install
-   ```
+```bash
+git clone https://github.com/GhariebML/AutoAnalyst-AI.git
+cd AutoAnalyst-AI
+python -m venv .venv
+```
 
-3. **Run the Vite development server:**
-   ```powershell
-   npm run dev -- --host 127.0.0.1
-   ```
-   Open `http://127.0.0.1:5173` in your browser.
-
----
-
-## ⚙️ Environment Variables
-
-The application reads configurations from the local `.env` file. A comprehensive preview of supported parameters:
-
-| Variable | Description | Example / Default |
-| :--- | :--- | :--- |
-| `LLM_PROVIDER` | Selection of active LLM backend | `openai`, `openrouter`, `huggingface`, `ollama` |
-| `OPENAI_API_KEY` | Secret token for OpenAI | `sk-...` |
-| `OPENAI_MODEL` | Target OpenAI model | `gpt-4o` |
-| `OPENROUTER_API_KEY`| Token for OpenRouter API | `sk-or-...` |
-| `OPENROUTER_MODEL` | Model routing template on OpenRouter | `google/gemini-2.5-pro` or `openrouter/free` |
-| `HF_TOKEN` | Token for Hugging Face server access | `hf_...` |
-| `HF_MODEL` | Target Hugging Face inference endpoint | `deepseek-ai/DeepSeek-R1` |
-| `REDIS_URL` | Redis endpoint path (worker queue) | `redis://localhost:6379/0` |
-| `ADPILOT_DASHBOARD_USE_REAL_LLM` | Force client to request actual LLM runs | `true` (default: `false`, fallback to demo) |
-| `TEMPERATURE` | LLM creativity ceiling | `0.2` (low temperature preserves structured Pydantic schemas) |
-| `ENVIRONMENT` | Running context environment | `development` / `production` |
-
----
-
-## 🧪 Testing & Code Quality
-
-Validate correctness and formatting before committing:
-
-### Python Backend Testing
-
+Activate the environment (Windows PowerShell):
 ```powershell
-# Format check and import sorting via Ruff
-ruff check .
-
-# Execute backend unit and integration test suites
-pytest -v
+.venv\Scripts\Activate.ps1
 ```
 
-### Frontend Build Verification
+Activate the environment (Git Bash / Linux / macOS):
+```bash
+source .venv/bin/activate
+```
 
-```powershell
-cd frontend
-# Run TypeScript compilation and bundle build
-npm run build
+Install requirements and the editable package:
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
+
+### Run the Dashboard
+Run the Streamlit interactive dashboard:
+```bash
+streamlit run app/streamlit_app.py
+```
+
+### Running Test Suites
+Validate the codebase using `pytest`:
+```bash
+pytest
 ```
 
 ---
 
-## 🔒 Security Policy
+## 6. Contributing & Branch Policies
 
-- **Credential Hygiene:** Never commit `.env` or credentials. The project contains custom exclusions in `.gitignore` to protect against accidental credential leaks.
-- **Exposure Response:** If a key is committed, rotate it immediately in the provider dashboard.
-- **Reporting Vulnerabilities:** Please see the [Security Guidelines](SECURITY.md) to report issues safely.
+To ensure stability, developers must check code freeze dates and use the proper git flow:
+- All developers work on their designated `feature/` branch (e.g. `feature/data-profiling`).
+- Pushing code directly to the `develop` or `main` branches is blocked.
+- Commit logs must follow semantic prefixes: `feat:`, `fix:`, `docs:`, `test:`, or `refactor:`.
+- Create Pull Requests targeting `develop`. The PR must be reviewed and approved by Team 1.
 
 ---
 
-## 📄 License
+## 7. Contributors & Team Leads
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **PM & Systems Integration**: Mohamed Gharieb, Mohamed Abd Elkhalek
+- **Data Profiling Engine**: Aya Emad, Aya Mostafa
+- **EDA Engine**: Mohamed Kamal, Yomna Ashraf, Samar Mahmoud
+- **Preprocessing Engine**: Basma Mansour, Bothaina Elqady
+- **Machine Learning Engine**: Mohamed Khaled El-Shayp, Ahmed Gamal
+- **Evaluation & Insights Engine**: Youssef Al-komi, Sohad Abd El-Mohsen
+- **Dashboard & Reporting**: Hazem, Mahmoud Maher

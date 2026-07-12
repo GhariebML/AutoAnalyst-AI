@@ -1,36 +1,49 @@
-## PR Summary
-**What did you change?**
-<!-- Provide a brief description of the changes. -->
+﻿## Summary
 
-**Which agent/component does this affect?**
-<!-- e.g., StrategyAgent, ResearchAgent, schemas, docs -->
+Briefly describe what this Pull Request changes.
+
+## Related Issue
+
+Closes #
 
 ## Type of Change
-<!-- Mark with an `x` all that apply -->
-- [ ] Agent implementation
-- [ ] Schema update
-- [ ] Prompt update
-- [ ] Test update
+
+- [ ] Feature
+- [ ] Bug Fix
 - [ ] Documentation
 - [ ] Refactor
-- [ ] Bug fix
+- [ ] Test
+- [ ] Other
 
 ## Files Changed
-<!-- List key files modified/created -->
+
+- 
 - 
 - 
 
-## Validation Checklist
-<!-- Please verify all items before requesting review -->
-- [ ] I created this branch from `develop`
-- [ ] I pulled latest `develop` before pushing
-- [ ] I did not commit `.env` or secrets
-- [ ] I did not modify unrelated files
-- [ ] I followed the Pydantic schemas
-- [ ] I ran tests locally (`pytest -q`)
-- [ ] JSON outputs are valid
-- [ ] Agent output passes schema validation
-- [ ] Documentation updated if needed
+## How Was This Tested?
 
-## Reviewer Notes
-<!-- Anything the Team Lead should pay attention to -->
+Describe how you tested your changes.
+
+```bash
+python -m compileall -q app src tests
+pytest
+```
+
+## Screenshots, If Applicable
+
+Add screenshots for dashboard, charts, reports, or visual output changes.
+
+## Checklist
+
+- [ ] I worked on the correct feature branch
+- [ ] I pulled the latest changes from `develop`
+- [ ] My code runs locally
+- [ ] I updated documentation if needed
+- [ ] I added/updated the weekly update file
+- [ ] I am requesting review before merge
+- [ ] I did not include secrets, API keys, private files, or large raw datasets
+
+## Notes for Reviewer
+
+Mention any specific files, decisions, limitations, or questions the reviewer should focus on.
