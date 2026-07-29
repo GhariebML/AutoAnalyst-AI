@@ -39,10 +39,7 @@ from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 # ======================================================================
 # Safe import for FeatureBuilder (works both locally and in production)
 # ======================================================================
-try:
-    from feature_builder import FeatureBuilder
-except ImportError:
-    from ..feature_engineering.feature_builder import FeatureBuilder
+from autoanalyst.feature_engineering.feature_builder import FeatureBuilder
 
 
 logger = logging.getLogger(__name__)
@@ -847,37 +844,33 @@ class PreprocessingPipeline:
     def run(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         logger.info("Starting preprocessing pipeline. Input shape: %s", data_frame.shape)
 
+        # 1. Validation
         self._validator.run_initial_validation(data_frame)
 
-        data_frame = self._cleaner.clean(data_frame)
-        logger.info("Cleaning complete. Shape: %s", data_frame.shape)
+        # 2. Cleaning
+        df = self._cleaner.clean(data_frame)
 
-        data_frame = self._missing_value_handler.handle_missing_values(data_frame)
-        logger.info("Missing value handling complete. Shape: %s", data_frame.shape)
+        # 3. Missing Value Handling
+        df = self._missing_value_handler.handle_missing_values(df)
 
-        data_frame = self._outlier_handler.handle_outliers(data_frame)
-        logger.info("Outlier handling complete. Shape: %s", data_frame.shape)
+        # 4. Outlier Handling
+        df = self._outlier_handler.handle_outliers(df)
 
-        data_frame = self._encoder.one_hot_encode(data_frame)
-        logger.info("Encoding complete. Shape: %s", data_frame.shape)
+        # 5. Normalization
+        df = self._normalizer.normalize(df)
 
-        data_frame = self._scaler.scale(data_frame)
-        logger.info("Scaling complete. Shape: %s", data_frame.shape)
+        # 6. Feature Engineering
+        df = self._feature_builder.extract_datetime_features(df)
+        df = self._feature_builder.group_rare_categories(df)
 
-        data_frame = self._normalizer.normalize(data_frame)
-        logger.info("Normalization complete. Shape: %s", data_frame.shape)
+        # 7. Encoding
+        df = self._encoder.one_hot_encode(df)
 
-        data_frame = self._feature_builder.build_features(data_frame)
-        logger.info("Feature engineering complete. Shape: %s", data_frame.shape)
+        # 8. Scaling
+        df = self._scaler.scale(df)
 
-        self._validator.run_final_validation(data_frame)
-        logger.info("Preprocessing pipeline finished. Output shape: %s", data_frame.shape)
+        # 9. Final Validation
+        self._validator.run_final_validation(df)
 
-        return data_frame
-
-
-def build_ml_ready_dataset(
-    data_frame: pd.DataFrame, config: Optional[PreprocessingConfig] = None
-) -> pd.DataFrame:
-    pipeline = PreprocessingPipeline(config=config)
-    return pipeline.run(data_frame)
+        logger.info("Preprocessing pipeline complete. Output shape: %s", df.shape)
+        return df
