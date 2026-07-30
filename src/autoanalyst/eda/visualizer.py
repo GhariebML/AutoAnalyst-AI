@@ -53,6 +53,21 @@ def _sensible_bin_count(sample_size: int) -> int:
     return max(10, min(50, int((sample_size ** 0.5) * 3)))
 
 
+def _build_figure_metadata(build_fn, error_context: str) -> dict:
+    """Call a zero-arg Plotly figure builder and isolate unexpected failures.
+
+    Any exception raised while building or converting the figure (e.g. an
+    unexpected dtype combination in the underlying dataframe) is caught here
+    and re-raised as a clear ValueError instead of leaking a raw traceback.
+    """
+    try:
+        fig = build_fn()
+        return fig.to_plotly_json()
+    except Exception as exc:
+        logger.warning("Unexpected error while %s: %s", error_context, exc)
+        raise ValueError(f"Could not generate plot while {error_context}: {exc}") from exc
+
+
 def plot_histogram(df: pd.DataFrame, column: str) -> dict:
     """Generate histogram metadata for a single numeric column.
 
@@ -80,9 +95,11 @@ def plot_histogram(df: pd.DataFrame, column: str) -> dict:
 
     nbins = _sensible_bin_count(df[column].dropna().shape[0])
     logger.info("Generating histogram for column '%s' with %d bins.", column, nbins)
-    fig = px.histogram(df, x=column, nbins=nbins, title=f"Distribution of {column}")
 
-    return fig.to_plotly_json()
+    return _build_figure_metadata(
+        lambda: px.histogram(df, x=column, nbins=nbins, title=f"Distribution of {column}"),
+        f"generating histogram for '{column}'",
+    )
 
 
 def plot_distribution(df: pd.DataFrame, column: str) -> dict:
@@ -112,11 +129,13 @@ def plot_distribution(df: pd.DataFrame, column: str) -> dict:
 
     nbins = _sensible_bin_count(df[column].dropna().shape[0])
     logger.info("Generating distribution analysis for column '%s' with %d bins.", column, nbins)
-    fig = px.histogram(
-        df, x=column, nbins=nbins, marginal="box", title=f"Distribution of {column}"
-    )
 
-    return fig.to_plotly_json()
+    return _build_figure_metadata(
+        lambda: px.histogram(
+            df, x=column, nbins=nbins, marginal="box", title=f"Distribution of {column}"
+        ),
+        f"generating distribution analysis for '{column}'",
+    )
 
 
 def plot_correlation_heatmap(df: pd.DataFrame, method: str = "pearson") -> dict:
@@ -152,16 +171,17 @@ def plot_correlation_heatmap(df: pd.DataFrame, method: str = "pearson") -> dict:
         correlation_matrix.shape[1],
     )
 
-    fig = px.imshow(
-        correlation_matrix,
-        text_auto=".2f",
-        color_continuous_scale="RdBu_r",
-        zmin=-1,
-        zmax=1,
-        title=f"Correlation Heatmap ({method})",
+    return _build_figure_metadata(
+        lambda: px.imshow(
+            correlation_matrix,
+            text_auto=".2f",
+            color_continuous_scale="RdBu_r",
+            zmin=-1,
+            zmax=1,
+            title=f"Correlation Heatmap ({method})",
+        ),
+        f"generating {method} correlation heatmap",
     )
-
-    return fig.to_plotly_json()
 
 
 def plot_scatter(df: pd.DataFrame, x_column: str, y_column: str, color_column: str = None) -> dict:
@@ -199,15 +219,17 @@ def plot_scatter(df: pd.DataFrame, x_column: str, y_column: str, color_column: s
         raise KeyError(f"Column '{color_column}' not found in the dataframe.")
 
     logger.info("Generating scatter plot: %s vs %s.", y_column, x_column)
-    fig = px.scatter(
-        df,
-        x=x_column,
-        y=y_column,
-        color=color_column,
-        title=f"{y_column} vs {x_column}",
-    )
 
-    return fig.to_plotly_json()
+    return _build_figure_metadata(
+        lambda: px.scatter(
+            df,
+            x=x_column,
+            y=y_column,
+            color=color_column,
+            title=f"{y_column} vs {x_column}",
+        ),
+        f"generating scatter plot of '{y_column}' vs '{x_column}'",
+    )
 
 
 def plot_category_breakdown(
@@ -250,15 +272,21 @@ def plot_category_breakdown(
 
     if target_column is None:
         logger.info("Generating category breakdown (counts) for '%s'.", category_column)
-        counts = df[category_column].value_counts().reset_index()
-        counts.columns = [category_column, "count"]
-        fig = px.bar(
-            counts,
-            x=category_column,
-            y="count",
-            title=f"Distribution of {category_column}",
+
+        def _build_counts_figure():
+            counts = df[category_column].value_counts().reset_index()
+            counts.columns = [category_column, "count"]
+            return px.bar(
+                counts,
+                x=category_column,
+                y="count",
+                title=f"Distribution of {category_column}",
+            )
+
+        return _build_figure_metadata(
+            _build_counts_figure,
+            f"generating category breakdown for '{category_column}'",
         )
-        return fig.to_plotly_json()
 
     if target_column not in df.columns:
         logger.warning("Target column '%s' not found in the provided DataFrame.", target_column)
@@ -273,12 +301,17 @@ def plot_category_breakdown(
         target_column,
         category_column,
     )
-    rate = df.groupby(category_column, dropna=False)[target_column].mean().reset_index()
-    fig = px.bar(
-        rate,
-        x=category_column,
-        y=target_column,
-        title=f"{target_column} rate by {category_column}",
-    )
 
-    return fig.to_plotly_json()
+    def _build_rate_figure():
+        rate = df.groupby(category_column, dropna=False)[target_column].mean().reset_index()
+        return px.bar(
+            rate,
+            x=category_column,
+            y=target_column,
+            title=f"{target_column} rate by {category_column}",
+        )
+
+    return _build_figure_metadata(
+        _build_rate_figure,
+        f"generating '{target_column}' rate by '{category_column}'",
+    )
