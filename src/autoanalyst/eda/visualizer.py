@@ -43,6 +43,16 @@ def _validate_numeric_column(df: pd.DataFrame, column: str) -> None:
         raise ValueError(f"Column '{column}' has no non-null values to plot.")
 
 
+def _sensible_bin_count(sample_size: int) -> int:
+    """Pick a reasonable number of histogram bins based on sample size.
+
+    Plotly's automatic binning can collapse into 2-3 very wide bars on
+    small samples. This keeps bins readable across both tiny and large
+    datasets (bounded between 10 and 50 bins).
+    """
+    return max(10, min(50, int((sample_size ** 0.5) * 3)))
+
+
 def plot_histogram(df: pd.DataFrame, column: str) -> dict:
     """Generate histogram metadata for a single numeric column.
 
@@ -68,8 +78,9 @@ def plot_histogram(df: pd.DataFrame, column: str) -> dict:
     _validate_dataframe(df)
     _validate_numeric_column(df, column)
 
-    logger.info("Generating histogram for column '%s'.", column)
-    fig = px.histogram(df, x=column, title=f"Distribution of {column}")
+    nbins = _sensible_bin_count(df[column].dropna().shape[0])
+    logger.info("Generating histogram for column '%s' with %d bins.", column, nbins)
+    fig = px.histogram(df, x=column, nbins=nbins, title=f"Distribution of {column}")
 
     return fig.to_plotly_json()
 
@@ -99,8 +110,11 @@ def plot_distribution(df: pd.DataFrame, column: str) -> dict:
     _validate_dataframe(df)
     _validate_numeric_column(df, column)
 
-    logger.info("Generating distribution analysis for column '%s'.", column)
-    fig = px.histogram(df, x=column, marginal="box", title=f"Distribution of {column}")
+    nbins = _sensible_bin_count(df[column].dropna().shape[0])
+    logger.info("Generating distribution analysis for column '%s' with %d bins.", column, nbins)
+    fig = px.histogram(
+        df, x=column, nbins=nbins, marginal="box", title=f"Distribution of {column}"
+    )
 
     return fig.to_plotly_json()
 
