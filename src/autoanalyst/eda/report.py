@@ -28,11 +28,94 @@ logger = logging.getLogger(__name__)
 
 PLOTLY_CDN_URL = "https://cdn.plot.ly/plotly-2.32.0.min.js"
 
+REPORT_CSS = """
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --card-bg: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 32px 16px 64px;
+  }
+  .report-container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: 40px;
+    margin-bottom: 12px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 8px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: #fafafa;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  tr:hover td {
+    background: #fafbff;
+  }
+  .skipped {
+    color: var(--muted);
+    font-style: italic;
+  }
+</style>
+"""
+
 
 def _figure_to_html_div(fig_dict: dict) -> str:
-    """Convert Plotly figure metadata (a data/layout dict) into an embeddable HTML div."""
+    """Convert Plotly figure metadata (a data/layout dict) into a styled, embeddable HTML div."""
     fig = go.Figure(data=fig_dict.get("data", []), layout=fig_dict.get("layout", {}))
-    return pio.to_html(fig, full_html=False, include_plotlyjs=False)
+    fig.update_layout(
+        template="plotly_white",
+        margin=dict(l=50, r=30, t=50, b=40),
+        height=420,
+        font=dict(family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"),
+    )
+    html_div = pio.to_html(fig, full_html=False, include_plotlyjs=False)
+    return f'<div class="card">{html_div}</div>'
 
 
 def generate_eda_html_report(
@@ -87,7 +170,7 @@ def generate_eda_html_report(
 
     summary = get_numeric_summary(df)
     sections.append("<h2>Descriptive Statistics</h2>")
-    sections.append(summary.to_html(border=0))
+    sections.append(f'<div class="card">{summary.to_html(border=0)}</div>')
 
     sections.append("<h2>Correlation Heatmap</h2>")
     try:
@@ -95,7 +178,7 @@ def generate_eda_html_report(
         sections.append(_figure_to_html_div(heatmap_dict))
     except ValueError as exc:
         logger.info("Skipping correlation heatmap: %s", exc)
-        sections.append(f"<p><em>Skipped: {exc}</em></p>")
+        sections.append(f'<p class="skipped">Skipped: {exc}</p>')
 
     sections.append("<h2>Distributions</h2>")
     numeric_columns = df.select_dtypes(include="number").columns
@@ -114,12 +197,14 @@ def generate_eda_html_report(
             sections.append(_figure_to_html_div(breakdown_dict))
         except (KeyError, ValueError) as exc:
             logger.info("Skipping category breakdown: %s", exc)
-            sections.append(f"<p><em>Skipped: {exc}</em></p>")
+            sections.append(f'<p class="skipped">Skipped: {exc}</p>')
 
+    body = "".join(sections)
     html = (
         "<html><head><meta charset='utf-8'>"
         f"<script src='{PLOTLY_CDN_URL}'></script>"
-        "</head><body>" + "".join(sections) + "</body></html>"
+        f"{REPORT_CSS}"
+        f'</head><body><div class="report-container">{body}</div></body></html>'
     )
 
     path = Path(output_path)
