@@ -52,6 +52,16 @@ class TestPlotHistogram:
         with pytest.raises(ValueError):
             plot_histogram(pd.DataFrame({"age": []}), "age")
 
+    def test_isolates_unexpected_plotly_error_as_value_error(self, sample_df, monkeypatch):
+        import plotly.express as px
+
+        def _broken_histogram(*args, **kwargs):
+            raise RuntimeError("simulated unexpected plotly failure")
+
+        monkeypatch.setattr(px, "histogram", _broken_histogram)
+        with pytest.raises(ValueError):
+            plot_histogram(sample_df, "age")
+
 
 class TestPlotDistribution:
     def test_returns_valid_plotly_metadata(self, sample_df):
