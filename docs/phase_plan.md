@@ -1,4 +1,4 @@
-# Project Phase Plan
+﻿# Project Phase Plan
 
 ## Phase 0 - Repository Setup and Team Alignment
 
@@ -7,27 +7,27 @@ Goal: Prepare the team and repository for safe collaboration.
 Tasks:
 
 - Confirm repository remote and branch strategy.
-- Confirm the final 7-team assignment and branch ownership.
-- Create GitHub Issues for each team.
+- Assign 14 members into 7 squads.
+- Create GitHub Issues for each squad.
 - Confirm environment setup instructions.
 - Run baseline tests.
 
 Acceptance Criteria:
 
 - All members can clone and run the project.
-- All teams know their branches and deliverables.
+- All squads know their branches and deliverables.
 - `pytest` passes on the base project.
 
 ## Phase 1 - Foundation Modules
 
 Goal: Strengthen the existing Python modules.
 
-Teams involved:
+Squads involved:
 
-- Team 2: Data Understanding & Profiling
-- Team 3: EDA & Visualization
-- Team 4: Preprocessing & Feature Engineering
-- Team 5: Machine Learning
+- Squad 2: Data loading and profiling
+- Squad 3: EDA
+- Squad 4: Preprocessing and features
+- Squad 5: Modeling and evaluation
 
 Acceptance Criteria:
 
@@ -35,31 +35,30 @@ Acceptance Criteria:
 - Important edge cases are tested.
 - No syntax errors using `python -m compileall -q app src tests`.
 
-## Phase 2 - Evaluation and Insights
+## Phase 2 - Agentic Architecture with LangChain and LangGraph
 
-Goal: Evaluate model outputs and convert technical metrics into clear insights.
+Goal: Design the AI workflow layer.
 
-Teams involved:
+Squads involved:
 
-- Team 6 leads Evaluation & Insights.
-- Team 5 provides model predictions and model comparison outputs.
-- Team 2-4 provide profiling, EDA, and preprocessing context for insight generation.
+- Squad 6 leads.
+- Other squads provide tool functions that agents can call.
 
 Acceptance Criteria:
 
-- Classification and regression metrics are documented and tested.
-- Evaluation outputs are structured for `PipelineResult.evaluation_results`.
-- Insight outputs are structured for `PipelineResult.insights`.
-- Recommendations are clear, grounded, and safe for non-technical readers.
+- Documented graph state.
+- Nodes for profiling, EDA, cleaning, modeling, insights, and reporting.
+- Deterministic dry-run path works without requiring secret API keys.
+- Optional LLM integration is clearly isolated behind environment variables.
 
 ## Phase 3 - Dashboard and Reporting Integration
 
 Goal: Turn backend modules into a usable product.
 
-Teams involved:
+Squads involved:
 
-- Team 7 leads Reporting & Dashboard.
-- Teams 2-6 provide integration outputs.
+- Squad 7 leads.
+- Squad 2-6 provide integrations.
 
 Acceptance Criteria:
 

@@ -1,26 +1,26 @@
-﻿# Team Delivery Plan
+﻿# 14-Member Team Delivery Plan
 
 ## Team Structure
 
-The project is divided into 7 teams. Team 1 is handled by Mohamed Gharieb for project management, GitHub workflow, and system integration. Teams 2-7 own the main technical and delivery workstreams.
+The project team has 14 members. Work is divided into 7 squads. Each squad has 2 members and owns one major workstream.
 
-For detailed task execution steps, use [`team_step_by_step_execution_guide.md`](team_step_by_step_execution_guide.md).
+> Replace `Member 1`, `Member 2`, etc. with real names after assigning the team.
 
-| Team | Members | Workstream | Branch | Main Output |
+| Squad | Members | Workstream | Branch | Main Output |
 |---|---|---|---|---|
-| Team 1 | Mohamed Gharieb | Project Management & GitHub / System Integration | `feature/project-management` | Clean repo workflow, issues, docs, milestones, integration coordination |
-| Team 2 | Ø­Ø§Ø²Ù… + Ù…Ø­Ù…ÙˆØ¯ Ù…Ø§Ù‡Ø± | Data Understanding & Profiling | `feature/data-profiling` | Data dictionary, robust loaders, profiling reports, data quality notes |
-| Team 3 | Ø£ÙŠÙ‡ + Ø¢ÙŠÙ‡ Ø¹Ù…Ø§Ø¯ | EDA & Visualization | `feature/eda-visualization` | EDA functions, charts, findings, visualization notes |
-| Team 4 | Ø¨Ø³Ù…Ù‡ + Ø±Ø¶ÙˆÙŠ | Preprocessing & Feature Engineering | `feature/preprocessing-features` | Cleaning pipeline, preprocessing helpers, feature builders |
-| Team 5 | Ø§Ù„ÙƒÙˆÙ…ÙŠ + Ø§Ù„Ø´Ø§ÙŠØ¨ | Machine Learning | `feature/modeling` | Baseline models, model wrappers, model comparison output |
-| Team 6 | Ø³Ù‡Ø§Ø¯ + Ù…Ø±ÙˆØ© | Evaluation & Insights | `feature/evaluation-insights` | Evaluation metrics, insight generator, recommendation notes |
-| Team 7 | ÙŠÙ…Ù†ÙŠ + Ù…Ø­Ù…Ø¯ ÙƒÙ…Ø§Ù„ | Reporting & Dashboard | `feature/reporting-dashboard` | Streamlit app, reports, screenshots, demo, final slides |
+| Squad 1 | Member 1, Member 2 | Project Management, GitHub, Documentation | `docs/project-management` | Clean repo workflow, issues, docs, milestones |
+| Squad 2 | Member 3, Member 4 | Data Loading and Data Profiling | `feature/data-loading-profiling` | Robust loaders and profiling reports |
+| Squad 3 | Member 5, Member 6 | EDA and Visualization | `feature/eda-visualization` | EDA functions, charts, notebook outputs |
+| Squad 4 | Member 7, Member 8 | Preprocessing and Feature Engineering | `feature/preprocessing-features` | Cleaning pipeline and feature builders |
+| Squad 5 | Member 9, Member 10 | Modeling and Evaluation | `feature/modeling-evaluation` | Classification/regression training and metrics |
+| Squad 6 | Member 11, Member 12 | LangChain/LangGraph Agent System | `feature/agentic-workflow` | Multi-agent workflow graph and orchestration |
+| Squad 7 | Member 13, Member 14 | Dashboard, Reporting, Final Presentation | `feature/dashboard-reporting` | Streamlit app, reports, demo, final slides |
 
-## Team Responsibilities
+## Squad Responsibilities
 
-### Team 1 â€” Project Management & GitHub / System Integration
+### Squad 1 - Project Management, GitHub, Documentation
 
-Owns the professional project structure, collaboration system, and cross-team integration coordination.
+Owns the professional project structure and collaboration system.
 
 Responsibilities:
 
@@ -29,24 +29,20 @@ Responsibilities:
 - Maintain milestones and project board if used.
 - Ensure branches and Pull Requests follow the workflow.
 - Review documentation quality before final delivery.
-- Confirm each team output can connect to `src/autoanalyst/pipeline.py`.
 
 Deliverables:
 
 - Updated documentation hub.
 - Clear task board.
-- Integration checklist.
 - Final repository checklist.
 - Release notes for final submission.
 
-### Team 2 â€” Data Understanding & Profiling
+### Squad 2 - Data Loading and Data Profiling
 
 Owns ingestion and dataset understanding.
 
 Responsibilities:
 
-- Select or confirm the project dataset.
-- Maintain `docs/data_dictionary.md`.
 - Improve CSV and Excel loaders.
 - Add validation for empty files, unsupported formats, and bad paths.
 - Generate dataset profiles: shape, columns, dtypes, missing values, duplicates, unique counts.
@@ -55,12 +51,11 @@ Responsibilities:
 Deliverables:
 
 - Reliable loading module.
-- Data dictionary.
 - Data profiling report output.
-- Data quality notes.
-- Unit tests or manual verification notes.
+- Unit tests.
+- Usage examples.
 
-### Team 3 â€” EDA & Visualization
+### Squad 3 - EDA and Visualization
 
 Owns exploratory analysis.
 
@@ -68,18 +63,17 @@ Responsibilities:
 
 - Add numeric and categorical summaries.
 - Add correlation analysis.
-- Build visualization helpers using Matplotlib, Seaborn, or Plotly.
-- Create EDA notes with sample dataset findings.
-- Save useful charts under `reports/figures/` when needed.
+- Build visualization helpers using Matplotlib/Seaborn/Plotly.
+- Create EDA notebook with sample dataset findings.
 
 Deliverables:
 
 - EDA module functions.
 - Visualization functions.
-- EDA findings.
+- EDA notebook.
 - Charts saved under `reports/figures/` when needed.
 
-### Team 4 â€” Preprocessing & Feature Engineering
+### Squad 4 - Preprocessing and Feature Engineering
 
 Owns data preparation.
 
@@ -88,82 +82,75 @@ Responsibilities:
 - Improve duplicate handling.
 - Improve missing-value handling.
 - Add categorical encoding helpers.
-- Add numeric scaling when useful.
 - Add datetime feature extraction.
 - Prepare a reusable preprocessing pipeline.
 
 Deliverables:
 
 - Cleaning functions.
-- Preprocessing helpers.
 - Feature engineering functions.
 - Tests for preprocessing and feature outputs.
-- Transformation notes.
+- Example processed dataset if appropriate.
 
-### Team 5 â€” Machine Learning
+### Squad 5 - Modeling and Evaluation
 
 Owns machine learning baseline models.
 
 Responsibilities:
 
-- Confirm classification or regression task type.
 - Improve classification wrapper.
 - Improve regression wrapper.
-- Add baseline model options.
-- Add model comparison helper.
+- Add model comparison option.
+- Add evaluation metrics.
 - Document target-column selection and model assumptions.
 
 Deliverables:
 
-- Classification workflow.
-- Regression workflow.
-- Model comparison output.
-- Modeling notes.
-- Tests for model functions.
+- Classification and regression workflows.
+- Evaluation reports.
+- Tests for model and metric functions.
+- Example modeling notebook.
 
-### Team 6 â€” Evaluation & Insights
+### Squad 6 - LangChain/LangGraph Agent System
 
-Owns model evaluation and insight generation.
+Owns the agentic AI layer.
 
 Responsibilities:
 
-- Add classification metrics: accuracy, precision, recall, F1-score, confusion matrix.
-- Add regression metrics: MAE, MSE/RMSE, RÂ².
-- Format metrics as dictionaries or DataFrames.
-- Generate insight bullets based on profiling and evaluation outputs.
-- Write clear recommendations for non-technical readers.
+- Design agents for each analysis stage.
+- Build a LangGraph workflow that routes dataset state between agents.
+- Use LangChain tools/runnables where useful.
+- Add clear state schema and graph nodes.
+- Keep LLM usage optional and safe.
 
 Deliverables:
 
-- Evaluation module.
-- Metric tables or dictionaries.
-- Insight generator.
-- Recommendation notes.
-- Tests for metric functions.
+- Agent architecture document.
+- LangGraph state design.
+- Starter agent workflow code.
+- Tests or dry-run examples using deterministic functions.
 
-### Team 7 â€” Reporting & Dashboard
+### Squad 7 - Dashboard, Reporting, Final Presentation
 
 Owns user-facing delivery.
 
 Responsibilities:
 
 - Improve Streamlit dashboard.
-- Connect dashboard to the central pipeline.
-- Display profiling, EDA, preprocessing, model, evaluation, and insight outputs.
+- Connect dashboard to profiling, EDA, cleaning, insights, and reporting modules.
 - Add Markdown report export.
-- Prepare screenshots, final report, and presentation.
+- Prepare final report and presentation.
 
 Deliverables:
 
 - Polished Streamlit app.
-- Generated Markdown report.
-- Dashboard screenshots.
+- Final Markdown report.
 - Demo script.
 - Final presentation outline.
 
 ## Communication Rules
 
-- Each team gives a short daily update: Done, Next, Blockers.
-- Every code change must go through Pull Request review into `develop`.
-- Every team must include tests or a manual verification note.
+- Each squad gives a short daily update: Done, Next, Blockers.
+- Every code change must go through Pull Request review.
+- Every squad must include tests or a manual verification note.
 - No secrets, API keys, private datasets, or local paths should be committed.
