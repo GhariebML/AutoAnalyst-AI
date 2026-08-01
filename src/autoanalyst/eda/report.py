@@ -105,8 +105,14 @@ REPORT_CSS = """
 """
 
 
-def _figure_to_html_div(fig_dict: dict) -> str:
-    """Convert Plotly figure metadata (a data/layout dict) into a styled, embeddable HTML div."""
+def _figure_to_html_div(fig_dict: dict, save_path: Path = None) -> str:
+    """Convert Plotly figure metadata into a styled, embeddable HTML div.
+
+    If save_path is provided, also writes a static PNG copy of the figure
+    to that path (requires the optional `kaleido` package, and Chrome to
+    be installed in the runtime environment). If that export fails for any
+    reason, a warning is logged and the HTML report still succeeds normally.
+    """
     fig = go.Figure(data=fig_dict.get("data", []), layout=fig_dict.get("layout", {}))
     fig.update_layout(
         template="plotly_white",
@@ -114,6 +120,14 @@ def _figure_to_html_div(fig_dict: dict) -> str:
         height=420,
         font=dict(family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"),
     )
+
+    if save_path is not None:
+        try:
+            save_path.parent.mkdir(parents=True, exist_ok=True)
+            fig.write_image(str(save_path))
+        except Exception as exc:
+            logger.warning("Could not save static figure to %s: %s", save_path, exc)
+
     html_div = pio.to_html(fig, full_html=False, include_plotlyjs=False)
     return f'<div class="card">{html_div}</div>'
 
@@ -123,6 +137,7 @@ def generate_eda_html_report(
     output_path: str,
     category_column: str = None,
     target_column: str = None,
+    figures_dir: str = None,
 ) -> Path:
     """Generate a single-file HTML EDA report for a DataFrame.
 
@@ -143,6 +158,12 @@ def generate_eda_html_report(
     target_column : str, optional
         Numeric target column to compute a rate per category
         (e.g. "loan_status"). Ignored if category_column is not provided.
+    figures_dir : str, optional
+        If provided, a static PNG copy of every chart is also saved into
+        this directory (e.g. "reports/figures"), in addition to the
+        interactive charts embedded in the HTML report. Requires the
+        optional `kaleido` package; if image export fails for any reason,
+        the HTML report is still generated normally.
 
     Returns
     -------
@@ -166,6 +187,8 @@ def generate_eda_html_report(
 
     logger.info("Building EDA HTML report for a dataframe with shape %s.", df.shape)
 
+    figures_path = Path(figures_dir) if figures_dir is not None else None
+
     sections = ["<h1>EDA Report</h1>"]
 
     summary = get_numeric_summary(df)
@@ -175,7 +198,8 @@ def generate_eda_html_report(
     sections.append("<h2>Correlation Heatmap</h2>")
     try:
         heatmap_dict = plot_correlation_heatmap(df)
-        sections.append(_figure_to_html_div(heatmap_dict))
+        save_path = figures_path / "correlation_heatmap.png" if figures_path else None
+        sections.append(_figure_to_html_div(heatmap_dict, save_path))
     except ValueError as exc:
         logger.info("Skipping correlation heatmap: %s", exc)
         sections.append(f'<p class="skipped">Skipped: {exc}</p>')
@@ -185,8 +209,9 @@ def generate_eda_html_report(
     for column in numeric_columns:
         try:
             dist_dict = plot_distribution(df, column)
+            save_path = figures_path / f"distribution_{column}.png" if figures_path else None
             sections.append(f"<h3>{column}</h3>")
-            sections.append(_figure_to_html_div(dist_dict))
+            sections.append(_figure_to_html_div(dist_dict, save_path))
         except ValueError as exc:
             logger.info("Skipping distribution for '%s': %s", column, exc)
 
@@ -194,7 +219,8 @@ def generate_eda_html_report(
         sections.append(f"<h2>Breakdown by {category_column}</h2>")
         try:
             breakdown_dict = plot_category_breakdown(df, category_column, target_column)
-            sections.append(_figure_to_html_div(breakdown_dict))
+            save_path = figures_path / f"breakdown_{category_column}.png" if figures_path else None
+            sections.append(_figure_to_html_div(breakdown_dict, save_path))
         except (KeyError, ValueError) as exc:
             logger.info("Skipping category breakdown: %s", exc)
             sections.append(f'<p class="skipped">Skipped: {exc}</p>')
