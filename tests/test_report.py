@@ -54,6 +54,29 @@ class TestGenerateEdaHtmlReport:
 
         assert result_path.exists()
 
+    def test_report_still_succeeds_when_figures_dir_given(self, sample_df, tmp_path):
+        """The HTML report must always succeed, whether or not the optional
+        static PNG export works -- static export depends on Chrome/kaleido
+        being available in the runtime environment, which isn't guaranteed."""
+        output_path = tmp_path / "report.html"
+        figures_dir = tmp_path / "figures"
+
+        result_path = generate_eda_html_report(
+            sample_df,
+            str(output_path),
+            category_column="loan_grade",
+            target_column="loan_status",
+            figures_dir=str(figures_dir),
+        )
+
+        assert result_path.exists()
+
+    def test_report_still_generated_when_figures_dir_omitted(self, sample_df, tmp_path):
+        output_path = tmp_path / "report.html"
+        result_path = generate_eda_html_report(sample_df, str(output_path))
+
+        assert result_path.exists()
+
     def test_skips_heatmap_gracefully_with_one_numeric_column(self, tmp_path):
         df = pd.DataFrame({"age": [25, 30, 35], "city": ["Cairo", "Giza", "Alex"]})
         output_path = tmp_path / "report.html"
