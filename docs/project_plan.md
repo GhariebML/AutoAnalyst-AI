@@ -1,4 +1,4 @@
-# Professional Project Plan
+﻿# Professional Project Plan
 
 ## Project Goal
 
@@ -6,7 +6,7 @@ Build AutoAnalyst AI as a modular and agent-ready data analysis system that help
 
 ## Team Model
 
-The project is divided into 7 teams. Team 1 is Mohamed Gharieb for project management, GitHub workflow, and system integration. Teams 2-7 own the main technical and delivery workstreams.
+The 14-member team is divided into 7 squads. Each squad has 2 members and owns one project workstream.
 
 Detailed team split:
 
@@ -20,7 +20,7 @@ Detailed team split:
 |---|---|---|
 | Phase 0 | Setup and Alignment | Repo setup, team assignment, baseline validation |
 | Phase 1 | Foundation Modules | Data loading, profiling, EDA, preprocessing, modeling |
-| Phase 2 | Evaluation and Insights | Model metrics, insight generation, and recommendations |
+| Phase 2 | Agentic Architecture | LangChain/LangGraph workflow design and dry-run implementation |
 | Phase 3 | Dashboard and Reporting | Streamlit integration and report export |
 | Phase 4 | Testing and Documentation | QA, docs, final report |
 | Phase 5 | Final Demo | Presentation and delivery |
@@ -31,11 +31,21 @@ Full phase details:
 
 ## Technical Direction
 
-The project should keep the current Python package structure and focus on a deterministic end-to-end analytics pipeline. Optional agentic features can be explored later, but the current team distribution focuses on data profiling, EDA, preprocessing, machine learning, evaluation, insights, reporting, dashboard delivery, and system integration.
+The project should keep the current Python package structure and add an optional agentic layer:
+
+```text
+src/autoanalyst/agents/
+```
+
+The agentic layer should use:
+
+- LangChain for tools, prompts, optional LLM calls, and model abstraction.
+- LangGraph for stateful workflow orchestration.
+- Deterministic fallback logic so the project can run without API keys.
 
 ## Quality Gates
 
-Before merging any team work:
+Before merging any squad work:
 
 ```bash
 python -m compileall -q app src tests
@@ -53,6 +63,7 @@ ruff format --check .
 
 - Working Python package.
 - Streamlit dashboard.
+- Agentic LangGraph workflow prototype.
 - Tests for core modules.
 - Final report.
 - Professional documentation folder.
