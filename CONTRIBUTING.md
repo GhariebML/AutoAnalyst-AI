@@ -46,6 +46,25 @@ Each sub-team should:
 
 Assigned branches are documented in [`docs/team_branch_assignments.md`](docs/team_branch_assignments.md).
 
+## Integration-Friendly Contribution Rules
+
+AutoAnalyst AI is an end-to-end system. Every feature should connect cleanly to the central pipeline in:
+
+```text
+src/autoanalyst/pipeline.py
+```
+
+Before opening a Pull Request, contributors should confirm:
+
+1. The change has clear inputs and outputs.
+2. The change can be called from the central pipeline or has a documented reason why not yet.
+3. The dashboard does not duplicate business logic from backend modules.
+4. New module outputs are structured for reports, insights, dashboard display, or future agents.
+5. Integration tests are added or updated when pipeline behavior changes.
+6. Documentation explains how the work fits into the full workflow.
+
+See [`docs/end_to_end_integration_strategy.md`](docs/end_to_end_integration_strategy.md).
+
 ## Commit Message Format
 
 Use this format:
@@ -96,6 +115,7 @@ Before opening a Pull Request, confirm:
 - [ ] I added docstrings/type hints for new Python functions.
 - [ ] I updated documentation if needed.
 - [ ] I added or updated the weekly update file if this is weekly work.
+- [ ] I confirmed my change fits the end-to-end pipeline or documented the integration gap.
 - [ ] I ran `python -m compileall -q app src tests` locally if I changed Python code.
 - [ ] I ran `pytest` locally if I changed Python code.
 - [ ] I did not commit private files, secrets, API keys, or large raw datasets.

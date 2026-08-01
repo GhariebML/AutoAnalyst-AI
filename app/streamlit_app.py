@@ -1,4 +1,4 @@
-"""Streamlit dashboard starter for AutoAnalyst AI."""
+"""Streamlit dashboard for AutoAnalyst AI."""
 
 from __future__ import annotations
 
@@ -13,8 +13,7 @@ SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
-from autoanalyst.data_profiling.profiler import get_missing_values_report  # noqa: E402
-from autoanalyst.insights.insight_generator import generate_dataset_insights  # noqa: E402
+from autoanalyst.pipeline import PipelineConfig, run_analysis_pipeline  # noqa: E402
 
 st.set_page_config(page_title="AutoAnalyst AI", page_icon="📊", layout="wide")
 st.title("📊 AutoAnalyst AI")
@@ -31,16 +30,54 @@ except Exception as exc:
     st.error(f"Could not read the uploaded file: {exc}")
     st.stop()
 
+st.sidebar.header("Pipeline Options")
+target_options = [""] + list(df.columns)
+target_column = st.sidebar.selectbox("Optional target column", target_options)
+model_task = st.sidebar.selectbox("Model task", ["auto", "classification", "regression"])
+
+try:
+    result = run_analysis_pipeline(
+        df,
+        PipelineConfig(target_column=target_column or None, model_task=model_task),
+    )
+except Exception as exc:
+    st.error(f"Pipeline failed: {exc}")
+    st.stop()
+
 st.subheader("Dataset Preview")
-st.dataframe(df.head(20), use_container_width=True)
-col1, col2, col3 = st.columns(3)
-col1.metric("Rows", df.shape[0])
-col2.metric("Columns", df.shape[1])
-col3.metric("Missing Values", int(df.isna().sum().sum()))
+st.dataframe(result.raw_df.head(20), use_container_width=True)
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Raw Rows", result.raw_df.shape[0])
+col2.metric("Raw Columns", result.raw_df.shape[1])
+col3.metric("Cleaned Rows", result.cleaned_df.shape[0])
+col4.metric("Missing Values", int(result.raw_df.isna().sum().sum()))
+
+st.subheader("Data Profile")
+st.json(result.profile)
+
 st.subheader("Missing Values Report")
-st.dataframe(get_missing_values_report(df), use_container_width=True)
+st.dataframe(result.missing_values_report, use_container_width=True)
+
 st.subheader("Basic Statistics")
-st.dataframe(df.describe(include="all").T, use_container_width=True)
+if "numeric_summary" in result.eda_results:
+    st.dataframe(result.eda_results["numeric_summary"], use_container_width=True)
+else:
+    st.info("No numeric columns found for numeric summary.")
+
+if "correlation_matrix" in result.eda_results:
+    st.subheader("Correlation Matrix")
+    st.dataframe(result.eda_results["correlation_matrix"], use_container_width=True)
+
+if result.evaluation_results:
+    st.subheader("Model Evaluation")
+    st.json(result.evaluation_results)
+
 st.subheader("Starter Insights")
-for insight in generate_dataset_insights(df):
+for insight in result.insights:
     st.write(f"- {insight}")
+
+if result.warnings:
+    st.subheader("Pipeline Warnings")
+    for warning in result.warnings:
+        st.warning(warning)
