@@ -42,6 +42,14 @@ class TestGetNumericSummary:
         with pytest.raises(ValueError):
             get_numeric_summary(df)
 
+    def test_isolates_unexpected_pandas_error_as_value_error(self, sample_df, monkeypatch):
+        def _broken_describe(self, *args, **kwargs):
+            raise RuntimeError("simulated unexpected pandas failure")
+
+        monkeypatch.setattr(pd.DataFrame, "describe", _broken_describe)
+        with pytest.raises(ValueError):
+            get_numeric_summary(sample_df)
+
 
 class TestGetCorrelationMatrix:
     def test_returns_square_matrix_with_expected_labels(self, sample_df):
@@ -83,3 +91,11 @@ class TestGetCorrelationMatrix:
         df = pd.DataFrame({"age": [25, 30, 35], "city": ["Cairo", "Giza", "Alex"]})
         with pytest.raises(ValueError):
             get_correlation_matrix(df)
+
+    def test_isolates_unexpected_pandas_error_as_value_error(self, sample_df, monkeypatch):
+        def _broken_corr(self, *args, **kwargs):
+            raise RuntimeError("simulated unexpected pandas failure")
+
+        monkeypatch.setattr(pd.DataFrame, "corr", _broken_corr)
+        with pytest.raises(ValueError):
+            get_correlation_matrix(sample_df)
