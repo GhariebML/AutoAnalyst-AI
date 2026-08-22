@@ -22,7 +22,7 @@ from autoanalyst.feature_engineering.feature_builder import (
 from autoanalyst.insights.insight_generator import generate_dataset_insights
 from autoanalyst.pipeline import load_dataset
 from autoanalyst.preprocessing.cleaner import handle_missing_values, remove_duplicates
-from autoanalyst.reporting.report_generator import create_markdown_report
+from autoanalyst.reporting.report_generator import create_full_report, create_markdown_report
 
 
 @tool
@@ -86,6 +86,36 @@ def create_report_tool(insights: list[str], output_path: str, title: str = "Auto
     return str(create_markdown_report(title, insights, output_path))
 
 
+@tool
+def create_full_report_tool(
+    profile: dict[str, Any],
+    insights: list[str],
+    output_path: str,
+    title: str = "AutoAnalyst AI Report",
+    missing_report: pd.DataFrame | None = None,
+    eda_results: dict[str, Any] | None = None,
+    cleaning_log: list[str] | None = None,
+    model_results: dict[str, Any] | None = None,
+    evaluation_results: dict[str, Any] | None = None,
+    warnings: list[str] | None = None,
+) -> str:
+    """Write a complete Markdown analysis report (overview, EDA, metrics, insights) to output_path."""
+    return str(
+        create_full_report(
+            output_path=output_path,
+            title=title,
+            profile=profile,
+            insights=insights,
+            missing_report=missing_report,
+            eda_results=eda_results,
+            cleaning_log=cleaning_log,
+            model_results=model_results,
+            evaluation_results=evaluation_results,
+            warnings=warnings,
+        )
+    )
+
+
 ALL_TOOLS: list[BaseTool] = [
     load_dataset_tool,
     profile_dataset_tool,
@@ -97,12 +127,14 @@ ALL_TOOLS: list[BaseTool] = [
     encode_categoricals_tool,
     generate_insights_tool,
     create_report_tool,
+    create_full_report_tool,
 ]
 
 __all__ = [
     "ALL_TOOLS",
     "clean_missing_values_tool",
     "correlation_matrix_tool",
+    "create_full_report_tool",
     "create_report_tool",
     "detect_high_cardinality_tool",
     "encode_categoricals_tool",

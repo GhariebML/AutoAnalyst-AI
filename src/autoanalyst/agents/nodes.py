@@ -23,7 +23,7 @@ import pandas as pd
 from autoanalyst.agents.state import AutoAnalystState, NodeRun
 from autoanalyst.agents.tools import (
     clean_missing_values_tool,
-    create_report_tool,
+    create_full_report_tool,
     encode_categoricals_tool,
     generate_insights_tool,
     load_dataset_tool,
@@ -254,12 +254,14 @@ def _modeling_impl(state: AutoAnalystState) -> dict[str, Any]:
             "train_rows": len(X_train),
             "test_rows": len(X_test),
         }
+        proba = None
     else:
         classifier = ClassificationModel(random_state=42)
         class_count = max(int(y.nunique()), 1)
         test_size = max(0.2, min(0.5, class_count / max(len(y), 1)))
         X_train, X_test, y_train, y_test = classifier.train(X, y, test_size=test_size)
         predictions = classifier.predict(X_test)
+        proba = [[float(value) for value in row] for row in classifier.predict_proba(X_test)]
         task = "classification"
         results = {
             "task": task,
@@ -268,7 +270,13 @@ def _modeling_impl(state: AutoAnalystState) -> dict[str, Any]:
             "test_rows": len(X_test),
         }
 
-    return {"model_results": results, "y_test": list(y_test), "y_pred": list(predictions)}
+    return {
+        "model_results": results,
+        "y_test": list(y_test),
+        "y_pred": list(predictions),
+        "y_proba": proba,
+        "label_classes": sorted(y.unique().tolist()),
+    }
 
 
 def _evaluation_impl(state: AutoAnalystState) -> dict[str, Any]:
@@ -280,9 +288,14 @@ def _evaluation_impl(state: AutoAnalystState) -> dict[str, Any]:
     results = state.get("model_results")
     is_regression = results is not None and results.get("task") == "regression"
     if is_regression:
-        metrics = evaluate_regression(pd.Series(y_test), pd.Series(y_pred))
+        metrics: dict[str, Any] = evaluate_regression(pd.Series(y_test), pd.Series(y_pred))
     else:
-        metrics = evaluate_classification(pd.Series(y_test), pd.Series(y_pred))
+        metrics = evaluate_classification(
+            pd.Series(y_test),
+            pd.Series(y_pred),
+            y_proba=state.get("y_proba"),
+            labels=state.get("label_classes"),
+        )
     return {"evaluation_results": metrics}
 
 
@@ -303,9 +316,16 @@ def _report_impl(state: AutoAnalystState) -> dict[str, Any]:
     if not report_path or not insights:
         return _skipped("report", "no report path configured or no insights generated.")
 
-    written = create_report_tool.invoke({
-        "insights": insights,
+    written = create_full_report_tool.invoke({
         "output_path": report_path,
         "title": "AutoAnalyst AI Agent Report",
+        "profile": state.get("profile") or {},
+        "insights": insights,
+        "missing_report": state.get("missing_values_report"),
+        "eda_results": state.get("eda_results") or {},
+        "cleaning_log": state.get("cleaning_log") or [],
+        "model_results": state.get("model_results"),
+        "evaluation_results": state.get("evaluation_results"),
+        "warnings": state.get("warnings") or [],
     })
     return {"report_path": written}

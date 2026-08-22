@@ -81,6 +81,8 @@ class AutoAnalystState(TypedDict, total=False):
     feature_columns: list[str]
     y_test: list[Any] | None
     y_pred: list[Any] | None
+    y_proba: list[list[float]] | None
+    label_classes: list[Any] | None
     model_results: dict[str, Any] | None
     evaluation_results: dict[str, Any] | None
     insights: list[str]
@@ -115,6 +117,8 @@ def create_initial_state(config: AutoAnalystConfig) -> AutoAnalystState:
         feature_columns=[],
         y_test=None,
         y_pred=None,
+        y_proba=None,
+        label_classes=None,
         model_results=None,
         evaluation_results=None,
         insights=[],
