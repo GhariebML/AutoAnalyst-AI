@@ -7,11 +7,14 @@ agent workflows can run one consistent system workflow.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 from autoanalyst.data_loading.loader import load_csv, load_excel
 from autoanalyst.data_profiling.profiler import generate_basic_profile, get_missing_values_report
@@ -89,20 +92,28 @@ def run_analysis_pipeline(
     config = config or PipelineConfig()
     warnings: list[str] = []
 
+    logger.info("Starting AutoAnalyst AI pipeline.")
+
     raw_df = load_dataset(dataset) if isinstance(dataset, str) else dataset.copy()
     if raw_df.empty:
         raise ValueError("Cannot run analysis on an empty dataset.")
+
+    logger.info("Dataset loaded: shape=%s", raw_df.shape)
 
     profile = generate_basic_profile(raw_df)
     missing_report = get_missing_values_report(raw_df)
     eda_results = _build_eda_results(raw_df, warnings)
 
+    logger.info("Preprocessing: removing duplicates and handling missing values.")
     cleaned_df = handle_missing_values(remove_duplicates(raw_df), strategy=config.missing_strategy)
+    logger.info("Cleaned dataset: shape=%s", cleaned_df.shape)
+
     model_ready_df = _build_model_ready_df(cleaned_df, config, warnings)
 
     model_results: dict[str, Any] | None = None
     evaluation_results: dict[str, Any] | None = None
     if config.target_column:
+        logger.info("Modeling: target='%s', task='%s'", config.target_column, config.model_task)
         model_results, evaluation_results = _train_and_evaluate(model_ready_df, config, warnings)
 
     insights = generate_dataset_insights(cleaned_df)
@@ -112,6 +123,9 @@ def run_analysis_pipeline(
     report_path = None
     if config.report_path:
         report_path = create_markdown_report("AutoAnalyst AI Report", insights, config.report_path)
+        logger.info("Report generated: %s", report_path)
+
+    logger.info("Pipeline complete. Warnings: %d", len(warnings))
 
     return PipelineResult(
         raw_df=raw_df,
@@ -150,7 +164,7 @@ def _build_model_ready_df(df: pd.DataFrame, config: PipelineConfig, warnings: li
         return df.copy()
 
     try:
-        categorical_columns = list(df.select_dtypes(include=["object", "category"]).columns)
+        categorical_columns = list(df.select_dtypes(include=["object", "category", "string"]).columns)
         if config.target_column in categorical_columns:
             categorical_columns.remove(config.target_column)
         return encode_categorical_columns(df, columns=categorical_columns)
