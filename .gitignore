@@ -6,6 +6,10 @@ __pycache__/
 build/
 dist/
 .pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
 
 # Local assistant/tool backups
 .openclaw-backups/
