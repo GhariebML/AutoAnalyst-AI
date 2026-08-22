@@ -33,6 +33,7 @@ def create_full_report(
     model_results: dict[str, Any] | None = None,
     evaluation_results: dict[str, Any] | None = None,
     warnings: list[str] | None = None,
+    executive_summary: str | None = None,
 ) -> Path:
     """Compile a complete Markdown analysis report from pipeline artifacts.
 
@@ -48,7 +49,10 @@ def create_full_report(
     eda_results = eda_results or {}
     lines: list[str] = [f"# {title}", ""]
 
-    lines.extend(["## Dataset Overview", ""])
+    if executive_summary:
+        lines.extend(["## Executive Summary", "", executive_summary])
+
+    lines.extend(["", "## Dataset Overview", ""])
     lines.extend(_overview_table(profile))
 
     if missing_report is not None and not missing_report.empty:

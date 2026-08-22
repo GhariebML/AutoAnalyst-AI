@@ -20,12 +20,13 @@ from typing import Any
 
 import pandas as pd
 
+from autoanalyst.agents.llm import create_llm, load_llm_settings
+from autoanalyst.agents.narrator import advisor_note, executive_summary, narrate_insights
 from autoanalyst.agents.state import AutoAnalystState, NodeRun
 from autoanalyst.agents.tools import (
     clean_missing_values_tool,
     create_full_report_tool,
     encode_categoricals_tool,
-    generate_insights_tool,
     load_dataset_tool,
     missing_values_report_tool,
     numeric_summary_tool,
@@ -304,10 +305,39 @@ def _insight_impl(state: AutoAnalystState) -> dict[str, Any]:
     if cleaned is None:
         return _skipped("insights", "no cleaned DataFrame available.")
 
-    insights = list(generate_insights_tool.invoke({"df": cleaned}))
-    if state.get("evaluation_results"):
-        insights.append(f"Model evaluation results were generated for target '{state.get('target_column')}'.")
-    return {"insights": insights}
+    llm = _resolve_llm()
+    narration = narrate_insights(
+        cleaned,
+        state.get("profile") or {},
+        state.get("model_results"),
+        state.get("evaluation_results"),
+        llm=llm,
+    )
+    insights = list(narration.texts)
+    advisor = advisor_note(state.get("model_results"), state.get("evaluation_results"), llm=llm)
+    if advisor:
+        insights.append(advisor)
+
+    summary = executive_summary(
+        state.get("profile") or {},
+        insights,
+        state.get("evaluation_results"),
+        llm=llm,
+    )
+    return {
+        "insights": insights,
+        "narrated_by": narration.source,
+        "executive_summary": summary,
+    }
+
+
+def _resolve_llm() -> Any:
+    """Resolve the configured chat model; None means deterministic narration."""
+    try:
+        return create_llm(load_llm_settings())
+    except RuntimeError as exc:
+        logger.warning("LLM unavailable (%s); continuing with rule-based narration.", exc)
+        return None
 
 
 def _report_impl(state: AutoAnalystState) -> dict[str, Any]:
@@ -327,5 +357,6 @@ def _report_impl(state: AutoAnalystState) -> dict[str, Any]:
         "model_results": state.get("model_results"),
         "evaluation_results": state.get("evaluation_results"),
         "warnings": state.get("warnings") or [],
+        "executive_summary": state.get("executive_summary"),
     })
     return {"report_path": written}

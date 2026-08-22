@@ -25,6 +25,10 @@ agents = [
     "pydantic>=2.7",
     "python-dotenv>=1.0",
 ]
+llm = [
+    "langchain-openai>=0.2",
+    "langchain-anthropic>=0.3",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

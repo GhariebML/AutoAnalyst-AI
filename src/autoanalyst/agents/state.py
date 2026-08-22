@@ -86,6 +86,8 @@ class AutoAnalystState(TypedDict, total=False):
     model_results: dict[str, Any] | None
     evaluation_results: dict[str, Any] | None
     insights: list[str]
+    narrated_by: str
+    executive_summary: str | None
 
     # observability (accumulating)
     warnings: Annotated[list[str], operator.add]
@@ -122,6 +124,8 @@ def create_initial_state(config: AutoAnalystConfig) -> AutoAnalystState:
         model_results=None,
         evaluation_results=None,
         insights=[],
+        narrated_by="rules",
+        executive_summary=None,
         warnings=[],
         errors=[],
         trace=[],

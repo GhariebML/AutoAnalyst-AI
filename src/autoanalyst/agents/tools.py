@@ -98,6 +98,7 @@ def create_full_report_tool(
     model_results: dict[str, Any] | None = None,
     evaluation_results: dict[str, Any] | None = None,
     warnings: list[str] | None = None,
+    executive_summary: str | None = None,
 ) -> str:
     """Write a complete Markdown analysis report (overview, EDA, metrics, insights) to output_path."""
     return str(
@@ -112,6 +113,7 @@ def create_full_report_tool(
             model_results=model_results,
             evaluation_results=evaluation_results,
             warnings=warnings,
+            executive_summary=executive_summary,
         )
     )
 
