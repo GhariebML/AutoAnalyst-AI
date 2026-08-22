@@ -9,18 +9,15 @@ Covers:
 
 import logging
 
-import numpy as np
 import pandas as pd
 import pytest
 
 from autoanalyst.feature_engineering.feature_builder import (
-    DEFAULT_HIGH_CARDINALITY_THRESHOLD,
     detect_high_cardinality_columns,
     encode_categorical_columns,
 )
 from autoanalyst.pipeline import PipelineConfig, run_analysis_pipeline
 from autoanalyst.preprocessing.cleaner import handle_missing_values, remove_duplicates
-
 
 # ======================================================================
 # High-Cardinality Detection Tests

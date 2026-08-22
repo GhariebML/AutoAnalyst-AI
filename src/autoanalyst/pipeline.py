@@ -14,8 +14,6 @@ from typing import Any, Literal
 
 import pandas as pd
 
-logger = logging.getLogger(__name__)
-
 from autoanalyst.data_loading.loader import load_csv, load_excel
 from autoanalyst.data_profiling.profiler import generate_basic_profile, get_missing_values_report
 from autoanalyst.eda.analyzer import get_correlation_matrix, get_numeric_summary
@@ -26,6 +24,8 @@ from autoanalyst.modeling.classification import ClassificationModel
 from autoanalyst.modeling.regression import RegressionModel
 from autoanalyst.preprocessing.cleaner import handle_missing_values, remove_duplicates
 from autoanalyst.reporting.report_generator import create_markdown_report
+
+logger = logging.getLogger(__name__)
 
 ModelTask = Literal["classification", "regression", "auto"]
 
@@ -191,18 +191,23 @@ def _train_and_evaluate(
 
     task = _detect_model_task(y, config.model_task)
     if task == "classification":
-        model = ClassificationModel(random_state=config.random_state)
+        classifier = ClassificationModel(random_state=config.random_state)
         test_size = _safe_classification_test_size(y, config.model_test_size)
-        X_train, X_test, y_train, y_test = model.train(X, y, test_size=test_size)
-        predictions = model.predict(X_test)
+        X_train, X_test, y_train, y_test = classifier.train(X, y, test_size=test_size)
+        predictions = classifier.predict(X_test)
         return (
-            {"task": task, "model_name": "RandomForestClassifier", "train_rows": len(X_train), "test_rows": len(X_test)},
+            {
+                "task": task,
+                "model_name": "RandomForestClassifier",
+                "train_rows": len(X_train),
+                "test_rows": len(X_test),
+            },
             evaluate_classification(y_test, predictions),
         )
 
-    model = RegressionModel(random_state=config.random_state)
-    X_train, X_test, y_train, y_test = model.train(X, y, test_size=config.model_test_size)
-    predictions = model.predict(X_test)
+    regressor = RegressionModel(random_state=config.random_state)
+    X_train, X_test, y_train, y_test = regressor.train(X, y, test_size=config.model_test_size)
+    predictions = regressor.predict(X_test)
     return (
         {"task": task, "model_name": "RandomForestRegressor", "train_rows": len(X_train), "test_rows": len(X_test)},
         evaluate_regression(y_test, predictions),
@@ -211,7 +216,7 @@ def _train_and_evaluate(
 
 def _detect_model_task(y: pd.Series, configured_task: ModelTask) -> Literal["classification", "regression"]:
     """Infer a simple modeling task when configured as auto."""
-    if configured_task in {"classification", "regression"}:
+    if configured_task == "classification" or configured_task == "regression":
         return configured_task
     if pd.api.types.is_numeric_dtype(y) and y.nunique() > 10:
         return "regression"
