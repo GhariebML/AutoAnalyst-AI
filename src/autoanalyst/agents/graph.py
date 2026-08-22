@@ -1,20 +1,23 @@
 """LangGraph assembly for the AutoAnalyst multiagent workflow.
 
-Builds the documented fixed graph (Stage 1 autonomy):
+Builds the documented graph with M3 supervisor intelligence:
 
     intake → profiling → eda → cleaning → features
         ├─ target available → modeling → evaluation ─┐
         └──────────────────────────────────────────→ insights → report → END
 
-The supervisor gains routing/retry intelligence in M3; today it is the
-error-containment wrapper on every node.
+Every edge is supervised: when ``fail_fast`` is enabled and any node has
+recorded an error, the supervisor routes to END instead of continuing.
+With ``require_approval`` the graph compiles with checkpoints and pauses
+before the cleaning/modeling steps (see ``agents/supervisor.py``).
 """
 
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pandas as pd
 from langgraph.graph import END, START, StateGraph
@@ -49,8 +52,35 @@ GRAPH_NODES = (
 )
 
 
-def build_graph() -> CompiledStateGraph:
-    """Compile the fixed AutoAnalyst agent graph."""
+def should_abort(state: AutoAnalystState) -> bool:
+    """True when fail-fast mode is on and at least one node failed."""
+    return bool(state.get("fail_fast")) and bool(state.get("errors"))
+
+
+def route_after_features(state: AutoAnalystState) -> str:
+    """Supervisor routing decision coming out of the feature node."""
+    if should_abort(state):
+        return END
+    target = state.get("target_column")
+    model_ready = state.get("model_ready_df")
+    if target and model_ready is not None and target in model_ready.columns:
+        return "modeling"
+    return "insights"
+
+
+def build_graph(
+    checkpointer: Any | None = None,
+    interrupt_before: Sequence[str] | None = None,
+) -> CompiledStateGraph:
+    """Compile the supervised AutoAnalyst agent graph.
+
+    Parameters
+    ----------
+    checkpointer:
+        Optional LangGraph checkpointer enabling resumable HITL runs.
+    interrupt_before:
+        Node names to pause before (used with ``require_approval``).
+    """
     builder = StateGraph(AutoAnalystState)
 
     builder.add_node("intake", dataset_intake_node)
@@ -64,20 +94,21 @@ def build_graph() -> CompiledStateGraph:
     builder.add_node("report", report_node)
 
     builder.add_edge(START, "intake")
-    builder.add_edge("intake", "profiling")
-    builder.add_edge("profiling", "eda")
-    builder.add_edge("eda", "cleaning")
-    builder.add_edge("cleaning", "features")
+    _supervised_edge(builder, "intake", "profiling")
+    _supervised_edge(builder, "profiling", "eda")
+    _supervised_edge(builder, "eda", "cleaning")
+    _supervised_edge(builder, "cleaning", "features")
     builder.add_conditional_edges(
         "features",
-        _route_after_features,
-        {"modeling": "modeling", "insights": "insights"},
+        route_after_features,
+        {"modeling": "modeling", "insights": "insights", END: END},
     )
-    builder.add_edge("modeling", "evaluation")
-    builder.add_edge("evaluation", "insights")
-    builder.add_edge("insights", "report")
+    _supervised_edge(builder, "modeling", "evaluation")
+    _supervised_edge(builder, "evaluation", "insights")
+    _supervised_edge(builder, "insights", "report")
     builder.add_edge("report", END)
-    return builder.compile()
+    interrupts = list(interrupt_before) if interrupt_before else None
+    return builder.compile(checkpointer=checkpointer, interrupt_before=interrupts)
 
 
 def run_agent_pipeline(config: AutoAnalystConfig) -> PipelineResult:
@@ -92,12 +123,13 @@ def run_agent_pipeline(config: AutoAnalystConfig) -> PipelineResult:
     return _to_pipeline_result(final_state)
 
 
-def _route_after_features(state: AutoAnalystState) -> str:
-    target = state.get("target_column")
-    model_ready = state.get("model_ready_df")
-    if target and model_ready is not None and target in model_ready.columns:
-        return "modeling"
-    return "insights"
+def _supervised_edge(builder: StateGraph, src: str, dst: str) -> None:
+    """Add src→dst with a fail-fast gate that routes to END on abort."""
+
+    def gate(state: AutoAnalystState) -> str:
+        return dst if not should_abort(state) else END
+
+    builder.add_conditional_edges(src, gate, {dst: dst, END: END})
 
 
 def _to_pipeline_result(state: AutoAnalystState) -> PipelineResult:
@@ -130,5 +162,7 @@ __all__ = [
     "GRAPH_NODES",
     "AutoAnalystConfig",
     "build_graph",
+    "route_after_features",
     "run_agent_pipeline",
+    "should_abort",
 ]

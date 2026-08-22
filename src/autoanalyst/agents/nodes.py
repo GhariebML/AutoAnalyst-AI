@@ -44,23 +44,43 @@ def _traced(
     state: AutoAnalystState,
     impl: Callable[[AutoAnalystState], dict[str, Any]],
 ) -> dict[str, Any]:
-    """Execute a node implementation with timing and error containment."""
+    """Execute a node implementation with retry, timing, and error containment.
+
+    Transient failures are retried up to ``state["max_retries"]`` times with a
+    linear backoff. Once retries are exhausted the failure is recorded in
+    ``errors`` (never raised) and escalated in ``escalations``.
+    """
+    max_retries = max(int(state.get("max_retries", 0)), 0)
+    backoff = max(float(state.get("retry_backoff_seconds", 0.0)), 0.0)
     started = time.perf_counter()
-    try:
-        update = impl(state)
-    except Exception as exc:
-        logger.exception("Agent node '%s' failed.", name)
-        return {
-            "errors": [f"{name}: {type(exc).__name__}: {exc}"],
-            "trace": [_trace(name, "error", started, error=f"{type(exc).__name__}: {exc}")],
-        }
-    if "trace" in update:
-        # Node recorded its own terminal trace entry (e.g. a skip);
-        # _skipped already logged the reason.
+
+    for attempt in range(1, max_retries + 2):
+        try:
+            update = impl(state)
+        except Exception as exc:
+            if attempt <= max_retries:
+                logger.warning(
+                    "Agent node '%s' failed (attempt %d/%d), retrying: %s",
+                    name, attempt, max_retries + 1, exc,
+                )
+                time.sleep(backoff * attempt)
+                continue
+            error = f"{type(exc).__name__}: {exc}"
+            logger.exception("Agent node '%s' failed after %d attempt(s).", name, attempt)
+            return {
+                "errors": [f"{name}: {error}"],
+                "escalations": [f"{name}: failed after {attempt} attempt(s); escalated to supervisor."],
+                "trace": [_trace(name, "error", started, attempts=attempt, error=error)],
+            }
+        if "trace" in update:
+            # Node recorded its own terminal trace entry (e.g. a skip);
+            # _skipped already logged the reason.
+            return update
+        update["trace"] = [_trace(name, "ok", started, attempts=attempt)]
+        logger.info("Agent node '%s' finished in %.1f ms.", name, round((time.perf_counter() - started) * 1000, 2))
         return update
-    update["trace"] = [_trace(name, "ok", started)]
-    logger.info("Agent node '%s' finished in %.1f ms.", name, round((time.perf_counter() - started) * 1000, 2))
-    return update
+
+    return {}  # pragma: no cover - loop always returns
 
 
 def _skipped(name: str, reason: str) -> dict[str, Any]:
@@ -72,9 +92,16 @@ def _skipped(name: str, reason: str) -> dict[str, Any]:
     }
 
 
-def _trace(name: str, status: str, started: float, error: str | None = None) -> NodeRun:
+def _trace(name: str, status: str, started: float, attempts: int = 1, error: str | None = None) -> NodeRun:
     duration_ms = round((time.perf_counter() - started) * 1000, 2)
-    return NodeRun(node=name, status=status, duration_ms=duration_ms, error=error)
+    return NodeRun(node=name, status=status, duration_ms=duration_ms, attempts=attempts, error=error)
+
+
+def _approved(state: AutoAnalystState, step: str) -> bool:
+    """HITL gate: nodes under approval must be explicitly approved."""
+    if not state.get("require_approval"):
+        return True
+    return bool(state.get("approvals", {}).get(step))
 
 
 # ----------------------------------------------------------------------
@@ -170,6 +197,8 @@ def _eda_impl(state: AutoAnalystState) -> dict[str, Any]:
 
 
 def _cleaning_impl(state: AutoAnalystState) -> dict[str, Any]:
+    if not _approved(state, "cleaning"):
+        return _skipped("cleaning", "awaiting human approval.")
     df = state.get("df")
     if df is None:
         return _skipped("cleaning", "no DataFrame available from intake.")
@@ -204,6 +233,8 @@ def _feature_impl(state: AutoAnalystState) -> dict[str, Any]:
 
 
 def _modeling_impl(state: AutoAnalystState) -> dict[str, Any]:
+    if not _approved(state, "modeling"):
+        return _skipped("modeling", "awaiting human approval.")
     model_ready = state.get("model_ready_df")
     target = state.get("target_column")
     if model_ready is None or not target or target not in model_ready.columns:

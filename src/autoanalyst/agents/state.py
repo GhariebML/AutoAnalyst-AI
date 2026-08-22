@@ -12,7 +12,7 @@ import operator
 from typing import Annotated, Any, TypedDict
 
 import pandas as pd
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class NodeRun(BaseModel):
@@ -23,6 +23,7 @@ class NodeRun(BaseModel):
     node: str
     status: str = "ok"
     duration_ms: float = 0.0
+    attempts: int = 1
     error: str | None = None
 
 
@@ -34,6 +35,16 @@ class AutoAnalystConfig(BaseModel):
     missing_strategy: str = "median"
     encode_categoricals: bool = True
     report_path: str | None = None
+
+    # supervisor intelligence (M3)
+    max_retries: int = Field(default=2, ge=0)
+    retry_backoff_seconds: float = Field(default=0.05, ge=0)
+    fail_fast: bool = False
+    require_approval: bool = False
+
+
+APPROVAL_STEPS = frozenset({"cleaning", "modeling"})
+"""Graph nodes that support human-in-the-loop approval gates."""
 
 
 class AutoAnalystState(TypedDict, total=False):
@@ -49,6 +60,13 @@ class AutoAnalystState(TypedDict, total=False):
     missing_strategy: str
     encode_categoricals: bool
     report_path: str | None
+
+    # supervisor settings (seeded from config, read by nodes/edges)
+    max_retries: int
+    retry_backoff_seconds: float
+    fail_fast: bool
+    require_approval: bool
+    approvals: dict[str, bool]
 
     # data frames
     df: pd.DataFrame | None
@@ -71,6 +89,7 @@ class AutoAnalystState(TypedDict, total=False):
     warnings: Annotated[list[str], operator.add]
     errors: Annotated[list[str], operator.add]
     trace: Annotated[list[NodeRun], operator.add]
+    escalations: Annotated[list[str], operator.add]
 
 
 def create_initial_state(config: AutoAnalystConfig) -> AutoAnalystState:
@@ -81,6 +100,11 @@ def create_initial_state(config: AutoAnalystConfig) -> AutoAnalystState:
         missing_strategy=config.missing_strategy,
         encode_categoricals=config.encode_categoricals,
         report_path=config.report_path,
+        max_retries=config.max_retries,
+        retry_backoff_seconds=config.retry_backoff_seconds,
+        fail_fast=config.fail_fast,
+        require_approval=config.require_approval,
+        approvals={},
         df=None,
         cleaned_df=None,
         model_ready_df=None,
@@ -97,4 +121,5 @@ def create_initial_state(config: AutoAnalystConfig) -> AutoAnalystState:
         warnings=[],
         errors=[],
         trace=[],
+        escalations=[],
     )
