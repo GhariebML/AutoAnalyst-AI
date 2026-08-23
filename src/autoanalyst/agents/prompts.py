@@ -45,3 +45,13 @@ Dataset profile (JSON):
 Key insights:
 {insights_block}
 """
+
+ANSWER_PROMPT = """You are answering an analyst's questions about a completed
+AutoAnalyst run. Answer concisely using ONLY the facts below. If the facts do
+not contain the answer, say what you would need.
+
+Facts (JSON):
+{facts_json}
+
+Question: {question}
+"""

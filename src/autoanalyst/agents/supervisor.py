@@ -99,6 +99,22 @@ class SupervisedRun:
             raise RuntimeError("Run has not been started.")
         return _to_pipeline_result(self._state)
 
+    @property
+    def finished(self) -> bool:
+        """True when the run started and no node remains to execute."""
+        if self._state is None:
+            return False
+        if not self._checkpointed:
+            return True
+        snapshot = self._graph.get_state(self._thread_config)
+        return not tuple(getattr(snapshot, "next", ()) or ())
+
+    def trace(self) -> list[Any]:
+        """Trace records for every executed/skipped/failed node so far."""
+        if self._state is None:
+            return []
+        return list(self._state.get("trace") or [])
+
     # ------------------------------------------------------------------
 
     def _invoke(self, input_state: Any) -> None:

@@ -151,6 +151,8 @@ def _to_pipeline_result(state: AutoAnalystState) -> PipelineResult:
         missing_values_report=missing_report if missing_report is not None else pd.DataFrame(),
         eda_results=state.get("eda_results") or {},
         insights=list(state.get("insights") or []),
+        narrated_by=str(state.get("narrated_by") or "rules"),
+        executive_summary=state.get("executive_summary"),
         model_results=state.get("model_results"),
         evaluation_results=state.get("evaluation_results"),
         report_path=Path(report_path) if report_path else None,

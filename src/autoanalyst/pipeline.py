@@ -54,6 +54,8 @@ class PipelineResult:
     missing_values_report: pd.DataFrame
     eda_results: dict[str, Any] = field(default_factory=dict)
     insights: list[str] = field(default_factory=list)
+    narrated_by: str = "rules"
+    executive_summary: str | None = None
     model_results: dict[str, Any] | None = None
     evaluation_results: dict[str, Any] | None = None
     report_path: Path | None = None
