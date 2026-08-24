@@ -17,7 +17,7 @@
   <b>AutoAnalyst AI</b> is a state-of-the-art, AI-native autonomous data analytics platform. It orchestrates a coordinated team of <b>specialized autonomous agents</b> to ingest raw tabular datasets, audit schema hygiene, compute bivariate correlation topologies, execute adaptive cleaning, benchmark predictive machine learning zoos, evaluate diagnostic holdout metrics, and compile interactive C-suite strategy reports—delivered via a high-density <b>Cyber Dark Command Center</b>.
 </p>
 
-[✨ System Highlights](#-system-highlights) • [🏛️ Architecture & Diagrams](#-architecture--diagrams) • [🤖 Multi-Agent Mesh](#-multi-agent-autonomous-mesh) • [🛠️ Analytical Tools](#-analytical-tools-catalog) • [💻 Setup & Quickstart](#-setup--quickstart) • [📡 API & Telemetry](#-api-endpoints--telemetry) • [🧪 Testing & Benchmarks](#-testing--quality-assurance)
+[✨ System Highlights](#-system-highlights) • [🖼️ Platform UI Showcase](#-platform-ui-showcase) • [🏛️ Architecture & Diagrams](#-architecture--diagrams) • [🤖 Multi-Agent Mesh](#-multi-agent-autonomous-mesh) • [🛠️ Analytical Tools](#-analytical-tools-catalog) • [💻 Setup & Quickstart](#-setup--quickstart) • [📡 API & Telemetry](#-api-endpoints--telemetry) • [🧪 Testing & Benchmarks](#-testing--quality-assurance)
 
 </div>
 
@@ -25,8 +25,8 @@
 
 ## ✨ System Highlights
 
-- 🤖 **Autonomous Multi-Agent Topology**: Coordinated by `MasterOrchestrator` across 6 specialized agents (`DataProfiling`, `EDA`, `Preprocessing`, `MachineLearning`, `Evaluation`, `Reporting`) with Human-In-The-Loop (HITL) safety gates.
-- 🧠 **Centralized OpenRouter LLM Gateway**: Dynamic model routing, automated fallback cascading (`openai/gpt-4o-mini` $\to$ `anthropic/claude-3.5-haiku`), exponential backoff on rate limits, Pydantic structured output validation, and live token usage tracking.
+- 🤖 **Autonomous Multi-Agent Topology**: Coordinated by `MasterOrchestrator` across 6 specialized agents (`DataProfiling`, `EDA`, `Preprocessing`, `MachineLearning`, `Evaluation`, `Reporting`) with Human-In-The-Loop (HITL) safety governance.
+- 🧠 **Centralized OpenRouter LLM Gateway**: Dynamic model routing, automated fallback cascading (`openai/gpt-4o-mini` $\to$ `anthropic/claude-3.5-haiku`), exponential backoff on rate limits, Pydantic structured output validation, and live token telemetry tracking.
 - 🛠️ **15 Deterministic Analytical Tools**: Production-grade tools for statistical distribution, missingness diagnosis, correlation topology, adaptive cleaning, model zoo benchmarking, and permutation feature importance.
 - 📊 **Analytics Command Center UI**: Real-time KPI row, time-series runs trends (7D/30D/90D), run status distribution donuts, and multi-agent activity monitoring.
 - 🔬 **Deep Analytics Studio**: Interactive 5-tab workspace covering *Executive Strategy*, *Model Zoo Benchmarks & Confusion Matrix*, *Correlation Heatmaps*, *Permutation Feature Drivers*, and *Preprocessing Transformations*.
@@ -36,9 +36,32 @@
 
 ---
 
+## 🖼️ Platform UI Showcase
+
+<div align="center">
+
+### 📊 Analytics Command Center Dashboard
+*Real-time KPI telemetry, time-series analysis trends, run status distributions, and multi-agent execution monitors.*
+
+![Analytics Command Center UI Showcase](docs/Assets/autoanalyst_dashboard_ui.jpg)
+
+<br/>
+
+### 🔬 Deep Analytics & Machine Learning Studio
+*Stratified cross-validation model zoo leaderboards, correlation topology heatmaps, permutation feature rankings, and confusion matrices.*
+
+![Deep Analytics Studio UI Showcase](docs/Assets/autoanalyst_analytics_studio.jpg)
+
+</div>
+
+---
+
 ## 🏛️ Architecture & Diagrams
 
 <div align="center">
+
+### 🤖 3D Multi-Agent Orchestration Mesh
+*Specialized autonomous agents collaborating over deterministic tool pipelines and central LLM reasoning.*
 
 ![AutoAnalyst Multi-Agent Architecture](docs/Assets/autoanalyst_agent_mesh.jpg)
 
@@ -381,7 +404,11 @@ AutoAnalyst-AI/
 │   ├── reporting/                # Cyber Dark Chart.js HTML and JSON report generation
 │   └── pipeline.py               # Synchronous pipeline runner
 ├── tests/                         # Comprehensive unit and integration test suite (219 tests)
-├── docs/Assets/                   # Visual architecture diagrams and hero banners
+├── docs/                          # Architecture, API Reference, and Agent Specifications
+│   ├── Assets/                   # Visual architecture diagrams and hero banners
+│   ├── ARCHITECTURE.md           # Deep-dive state machine & gateway architecture
+│   ├── API_REFERENCE.md          # REST API & SSE streaming reference
+│   └── AGENT_SPECIFICATION.md    # Multi-agent decision trees and tool contracts
 ├── docker-compose.yml             # Full-stack container orchestration
 ├── Dockerfile                     # Multi-stage container build
 └── pyproject.toml                 # Package configuration and dependencies
