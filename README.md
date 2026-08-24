@@ -1,224 +1,401 @@
 <div align="center">
 
-![AutoAnalyst AI Banner](docs/Assets/autoanalyst_banner.png)
+![AutoAnalyst AI Hero Banner](docs/Assets/autoanalyst_hero_banner.jpg)
 
 # 📊 AutoAnalyst AI
-### *Enterprise-Grade End-to-End Autonomous Data Analyst & ML Pipeline*
+### *Enterprise Full-Stack Autonomous Multi-Agent Data Analytics & Machine Learning Platform*
 
-[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/Framework-Streamlit-FF4B4B.svg?style=for-the-badge&logo=streamlit)](https://streamlit.io/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Quality Gate](https://img.shields.io/badge/Code%20Quality-Verified-success.svg?style=for-the-badge)](https://github.com/GhariebML/AutoAnalyst-AI)
+[![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%200.115-009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React%2019%20%2B%20TypeScript-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![LLM Gateway](https://img.shields.io/badge/LLM%20Gateway-OpenRouter%20Centralized-6366F1.svg?style=for-the-badge&logo=openai&logoColor=white)](https://openrouter.ai/)
+[![Test Coverage](https://img.shields.io/badge/Test%20Coverage-84.47%25-success.svg?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Tests Passing](https://img.shields.io/badge/Tests-219%20Passed-emerald.svg?style=for-the-badge)](https://github.com/GhariebML/AutoAnalyst-AI)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <b>AutoAnalyst AI</b> is a production-ready automated analytics platform. It consumes raw tabular datasets and autonomously executes schema profiling, descriptive statistical analysis, exploratory visualizations, categorical encoding, polynomial feature engineering, machine learning modeling (classification/regression), metrics evaluation, and business insight writing—all delivered via an interactive Streamlit dashboard.
+  <b>AutoAnalyst AI</b> is a state-of-the-art, AI-native autonomous data analytics platform. It orchestrates a coordinated team of <b>specialized autonomous agents</b> to ingest raw tabular datasets, audit schema hygiene, compute bivariate correlation topologies, execute adaptive cleaning, benchmark predictive machine learning zoos, evaluate diagnostic holdout metrics, and compile interactive C-suite strategy reports—delivered via a high-density <b>Cyber Dark Command Center</b>.
 </p>
 
-[✨ Core Workflow](#-core-workflow) • [📂 Project Structure](#-project-structure) • [📅 Release Timeline](#-release-timeline) • [📘 Handbooks](#-compiled-specifications) • [💻 Setup Guide](#-developer-onboarding)
+[✨ System Highlights](#-system-highlights) • [🏛️ Architecture & Diagrams](#-architecture--diagrams) • [🤖 Multi-Agent Mesh](#-multi-agent-autonomous-mesh) • [🛠️ Analytical Tools](#-analytical-tools-catalog) • [💻 Setup & Quickstart](#-setup--quickstart) • [📡 API & Telemetry](#-api-endpoints--telemetry) • [🧪 Testing & Benchmarks](#-testing--quality-assurance)
 
 </div>
 
 ---
 
-## ⚙️ Core Workflow
+## ✨ System Highlights
 
-The platform follows a decoupled, sequential pipeline structure where each step validates the output schema before handing it over to the next module.
+- 🤖 **Autonomous Multi-Agent Topology**: Coordinated by `MasterOrchestrator` across 6 specialized agents (`DataProfiling`, `EDA`, `Preprocessing`, `MachineLearning`, `Evaluation`, `Reporting`) with Human-In-The-Loop (HITL) safety gates.
+- 🧠 **Centralized OpenRouter LLM Gateway**: Dynamic model routing, automated fallback cascading (`openai/gpt-4o-mini` $\to$ `anthropic/claude-3.5-haiku`), exponential backoff on rate limits, Pydantic structured output validation, and live token usage tracking.
+- 🛠️ **15 Deterministic Analytical Tools**: Production-grade tools for statistical distribution, missingness diagnosis, correlation topology, adaptive cleaning, model zoo benchmarking, and permutation feature importance.
+- 📊 **Analytics Command Center UI**: Real-time KPI row, time-series runs trends (7D/30D/90D), run status distribution donuts, and multi-agent activity monitoring.
+- 🔬 **Deep Analytics Studio**: Interactive 5-tab workspace covering *Executive Strategy*, *Model Zoo Benchmarks & Confusion Matrix*, *Correlation Heatmaps*, *Permutation Feature Drivers*, and *Preprocessing Transformations*.
+- 📑 **Interactive Report Studio**: Real-time embedded HTML report previewer with responsive Chart.js visual charts and one-click multi-format downloads (`.HTML`, `.JSON`, `.CSV`).
+- 🩺 **System Health & Tool Registry**: Live latency diagnostics for SQLite, Storage, Orchestrator, and OpenRouter LLM, paired with a searchable 15-tool catalog.
+- 💬 **Context-Aware AI Analyst Copilot**: Grounded conversational assistant answering dataset questions directly against run state and tool outputs.
+
+---
+
+## 🏛️ Architecture & Diagrams
+
+<div align="center">
+
+![AutoAnalyst Multi-Agent Architecture](docs/Assets/autoanalyst_agent_mesh.jpg)
+
+</div>
+
+### 1. Full-Stack System Architecture
 
 ```mermaid
-flowchart LR
-    %% Style definitions
-    classDef ingest fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
-    classDef eda fill:#1e293b,stroke:#a855f7,stroke-width:2px,color:#fff;
-    classDef preprocess fill:#1e293b,stroke:#eab308,stroke-width:2px,color:#fff;
-    classDef model fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#fff;
-    classDef output fill:#1e293b,stroke:#ef4444,stroke-width:2px,color:#fff;
-
-    %% Nodes
-    subgraph Ingestion["📥 Data Ingestion"]
-        A["Raw Data Ingest<br>(CSV / Excel)"]:::ingest
-        B["Schema Validation<br>& Parsing"]:::ingest
-        A --> B
+flowchart TD
+    subgraph Client["🖥️ Frontend Client Layer (React 19 + TypeScript + Tailwind)"]
+        UI_Dash["📊 Analytics Command Center"]
+        UI_Hub["🗄️ Dataset Hub & Quality Radar"]
+        UI_Studio["🤖 Multi-Agent Studio & Topology"]
+        UI_Deep["🔬 Deep Analytics Studio (EDA, ML, Explainability)"]
+        UI_Reports["📑 Report Studio & Live HTML Previewer"]
+        UI_Health["🩺 System Health & Tool Registry"]
+        UI_Chat["💬 Grounded AI Copilot Drawer"]
     end
 
-    subgraph Analysis["📊 Auto EDA"]
-        C["Descriptive Statistics<br>(Mean, Median, Skew)"]:::eda
-        D["Feature Correlations<br>& Pearson Matrix"]:::eda
-        C --> D
+    subgraph Gateway["⚡ FastAPI Backend API Layer (Python 3.10+ / Async Uvicorn)"]
+        API_Routes["REST Router (/api/v1/*)"]
+        SSE_Stream["📡 Real-Time SSE Streamer (/runs/{id}/events)"]
+        DB_Store[("🗄️ SQLite Run & Dataset Store")]
+        File_Store[("📁 Versioned Artifact Storage")]
     end
 
-    subgraph Cleaning["⚙️ Preprocessing"]
-        E["Missing Value<br>Imputers"]:::preprocess
-        F["Categorical Encoders<br>(One-Hot / Target)"]:::preprocess
-        E --> F
+    subgraph LLMGateway["🧠 Centralized OpenRouter LLM Gateway"]
+        Router["Model Router & Task Classifier"]
+        PrimaryLLM["Primary: openai/gpt-4o-mini"]
+        FallbackLLM["Fallback: anthropic/claude-3.5-haiku"]
+        Validator["Pydantic Schema Validator"]
+        Tracker["LLM Usage & Token Telemetry Tracker"]
     end
 
-    subgraph Modeling["🤖 ML Engine"]
-        G{"Target Column<br>Configured?"}:::model
-        H["RF Classifier<br>(Classification)"]:::model
-        I["RF Regressor<br>(Regression)"]:::model
-        G -- "Label" --> H
-        G -- "Numeric" --> I
+    subgraph AgentCore["🤖 Multi-Agent Orchestration Core"]
+        Orchestrator["MasterOrchestrator (LangGraph State Graph)"]
+        HITL_Gate{"Human-In-The-Loop Safety Gate"}
+        
+        Agent_Profile["🔍 DataProfilingAgent"]
+        Agent_EDA["📈 EDAAgent"]
+        Agent_Prep["⚙️ PreprocessingAgent"]
+        Agent_ML["🤖 MachineLearningAgent"]
+        Agent_Eval["🩺 EvaluationAgent"]
+        Agent_Report["📑 ReportingAgent"]
     end
 
-    subgraph Insights["💡 Reporting & UI"]
-        J["Auto-Evaluator<br>(F1, RMSE, R²)"]:::output
-        K["Insight Generator<br>(Recommender)"]:::output
-        L["Streamlit Dashboard<br>& Markdown Exporter"]:::output
-        J --> K
-        K --> L
+    subgraph Tools["🛠️ 15 Deterministic Analytical Tools"]
+        T_Profile["ProfileDatasetTool • MissingnessReportTool"]
+        T_EDA["DistributionAnalysisTool • CorrelationAnalysisTool • OutlierDetectionTool"]
+        T_Prep["GeneratePlanTool • ExecuteCleaningTool • EncodeFeaturesTool"]
+        T_ML["InferMLTaskTool • BenchmarkModelsTool"]
+        T_Eval["EvaluateModelTool • PermutationImportanceTool"]
+        T_Report["CompileReportTool • DetectDriftTool • LoadDatasetTool"]
     end
 
-    %% Pipeline flow connections
-    B --> C
-    D --> E
-    F --> G
-    H & I --> J
+    %% Connections
+    Client <-->|"REST API Requests"| API_Routes
+    Gateway -->|"SSE Events"| UI_Studio
+    Gateway -->|"SSE Events"| UI_Dash
+    API_Routes <--> DB_Store
+    API_Routes <--> File_Store
+    API_Routes -->|"Dispatch Run"| Orchestrator
+
+    Orchestrator --> Agent_Profile --> Agent_EDA --> Agent_Prep
+    Agent_Prep --> HITL_Gate
+    HITL_Gate -->|"Approved"| Agent_ML
+    Agent_ML --> Agent_Eval --> Agent_Report
+
+    Agent_Profile & Agent_EDA & Agent_Prep & Agent_ML & Agent_Eval & Agent_Report <--> Tools
+    Agent_Profile & Agent_EDA & Agent_Prep & Agent_ML & Agent_Eval & Agent_Report <--> LLMGateway
+    Router --> PrimaryLLM
+    PrimaryLLM -.->|"On Failure / Limit"| FallbackLLM
+    PrimaryLLM & FallbackLLM --> Validator --> Tracker
 ```
 
 ---
 
-## 📂 Project Structure
+### 2. End-to-End Analytical Data Lineage
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 👤 Data Scientist / Analyst
+    participant Hub as 🗄️ Dataset Hub
+    participant Orch as 🤖 Master Orchestrator
+    participant Profile as 🔍 Profiling Agent
+    participant EDA as 📈 EDA Agent
+    participant Prep as ⚙️ Preprocessing Agent
+    participant HITL as 🛡️ HITL Approval
+    participant ML as 🤖 ML Agent
+    participant Eval as 🩺 Evaluation Agent
+    participant Rep as 📑 Reporting Agent
+    participant UI as 📊 Analytics Studio
+
+    User->>Hub: Upload Raw Dataset (CSV / Parquet / Excel)
+    Hub->>Orch: Initialize Analysis Run (Target Column, Task Mode)
+    
+    rect rgb(15, 23, 42)
+        Note over Orch, Profile: Stage 1: Data Hygiene & Schema Profiling
+        Orch->>Profile: Execute Data Profiling
+        Profile-->>Orch: Schema Types, Missingness %, Duplicate Rows, Health Score
+    end
+
+    rect rgb(15, 23, 42)
+        Note over Orch, EDA: Stage 2: Exploratory Statistical Analysis
+        Orch->>EDA: Execute EDA & Correlations
+        EDA-->>Orch: Numeric Skew, Bivariate Correlation Heatmap, Outliers
+    end
+
+    rect rgb(15, 23, 42)
+        Note over Orch, Prep: Stage 3: Adaptive Cleaning & Transformation
+        Orch->>Prep: Generate Preprocessing Plan
+        Prep-->>Orch: Imputation Strategy, One-Hot Encoding, Outlier Bounds
+    end
+
+    opt HITL Approval Enabled
+        Orch->>HITL: Pause Execution & Emit HITL_PAUSED Event
+        HITL->>User: Display Governance Approval Modal
+        User->>HITL: Approve / Modify Plan
+        HITL->>Orch: Resume Execution
+    end
+
+    rect rgb(15, 23, 42)
+        Note over Orch, ML: Stage 4: Model Zoo Benchmark
+        Orch->>ML: Infer Task & Train Model Zoo
+        ML-->>Orch: Stratified Cross-Validation Leaderboard & Champion Model
+    end
+
+    rect rgb(15, 23, 42)
+        Note over Orch, Eval: Stage 5: Holdout Diagnostic Testing
+        Orch->>Eval: Evaluate Model & Permutation Importance
+        Eval-->>Orch: Confusion Matrix, ROC-AUC, R², Feature Importances
+    end
+
+    rect rgb(15, 23, 42)
+        Note over Orch, Rep: Stage 6: Strategic Synthesis & Reporting
+        Orch->>Rep: Synthesize Findings & Compile Reports
+        Rep-->>Orch: Executive Summary, Structured Insights, HTML/JSON Artifacts
+    end
+
+    Orch->>UI: Emit RUN_COMPLETED Event
+    UI->>User: Display Full Interactive Analytics & Downloadable Reports
+```
+
+---
+
+## 🤖 Multi-Agent Autonomous Mesh
+
+AutoAnalyst AI deploys 6 specialized, deterministic agents that communicate through structured state transitions:
+
+| Agent | Responsibility | Analytical Tools Called | Grounded Output |
+| :--- | :--- | :--- | :--- |
+| **🔍 DataProfilingAgent** | Schema discovery, type inference, missingness matrix, duplicate detection | `ProfileDatasetTool`<br>`MissingnessReportTool` | Schema types, missingness breakdown, health score (0-100%) |
+| **📈 EDAAgent** | Statistical distributions, skewness, outlier detection, Pearson/Spearman correlations | `DistributionAnalysisTool`<br>`CorrelationAnalysisTool`<br>`OutlierDetectionTool` | Bivariate correlation matrix, numerical summary, outlier count |
+| **⚙️ PreprocessingAgent** | Adaptive imputation, one-hot & frequency encoding, high-cardinality protection | `GenerateTransformationPlanTool`<br>`ExecuteCleaningTool`<br>`EncodeFeaturesTool` | Cleaned dataframe, encoded feature vectors, transformation logs |
+| **🤖 MachineLearningAgent** | Automated task classification (classification vs regression), candidate model zoo training | `InferMLTaskTool`<br>`BenchmarkModelsTool` | Stratified CV leaderboard, champion model artifact, performance metrics |
+| **🩺 EvaluationAgent** | Holdout testing, confusion matrix generation, permutation feature importance ranking | `EvaluateModelTool`<br>`PermutationImportanceTool` | Holdout accuracy/F1/R2, confusion matrix, top feature drivers |
+| **📑 ReportingAgent** | Grounded insight extraction, executive brief writing, multi-format artifact generation | `CompileReportTool`<br>`DetectDriftTool` | C-suite executive summary, Chart.js HTML report, JSON/CSV exports |
+
+---
+
+## 🛠️ Analytical Tools Catalog
+
+All 15 analytical tools inherit from `BaseTool` with strict Pydantic input/output schemas:
 
 ```text
-AutoAnalyst-AI/
-├── app/                        # Streamlit dashboard interface
-│   └── streamlit_app.py        # Dashboard entry point
-├── data/                       # Local dataset ingestion storage
-│   ├── raw/                    # Raw credit risk & tabular uploads
-│   ├── processed/              # Intermediary clean pipeline outputs
-│   └── sample/                 # Verification files (example.csv)
-├── docs/                       # Corporate handbooks and team specifications
-│   ├── Teams/                  # Team specification folders
-│   │   ├── 01-Team-Project-Management/
-│   │   ├── 02-Team-Data-Profiling/
-│   │   ├── 03-Team-EDA/
-│   │   ├── 04-Team-Preprocessing/
-│   │   ├── 05-Team-Modeling/
-│   │   ├── 06-Team-Evaluation/
-│   │   └── 07-Team-Dashboard/
-│   └── PDF/                    # 13 Compiled enterprise PDFs
-├── src/autoanalyst/            # Core Python package codebase
-│   ├── data_loading/           # CSV/XLSX loaders and schema checks
-│   ├── data_profiling/         # Missing pattern counters & types
-│   ├── eda/                    # Correlation & descriptive statistics
-│   ├── preprocessing/          # Null imputers & categorical encoders
-│   ├── feature_engineering/    # Polynomial/ratio feature generator
-│   ├── modeling/               # RF Classifier & Regressor training
-│   ├── evaluation/             # Metrics calculator (F1, RMSE, R²)
-│   ├── insights/               # Automated recommendation generator
-│   ├── reporting/              # Markdown report compiler
-│   ├── utils/                  # Shared helper scripts
-│   └── pipeline.py             # Central orchestrator wrapper
-├── tests/                      # Pytest automated test suites
-├── pyproject.toml              # Build & dependency packaging
-└── README.md                   # Platform documentation
+src/autoanalyst/tools/
+├── data_tools.py          # LoadDatasetTool
+├── profiling_tools.py     # ProfileDatasetTool, MissingnessReportTool
+├── eda_tools.py           # DistributionAnalysisTool, CorrelationAnalysisTool, OutlierDetectionTool
+├── preprocessing_tools.py # GenerateTransformationPlanTool, ExecuteCleaningTool, EncodeFeaturesTool
+├── ml_tools.py            # InferMLTaskTool, BenchmarkModelsTool
+├── evaluation_tools.py    # EvaluateModelTool, PermutationImportanceTool
+└── reporting_tools.py     # CompileReportTool, DetectDriftTool
 ```
 
----
-
-## 📅 Release Timeline
-
-| Milestone | Target Date | Status | Objectives |
-| :--- | :--- | :--- | :--- |
-| **🚀 Project Kickoff** | July 11, 2026 | **Completed** | Scope definition, repository structure lock, and initial codebase setup. |
-| **❄️ Code Freeze** | July 23, 2026 | **In Progress** | Implementation freeze of all pipeline modules and unit test coverage checks. |
-| **🔄 Integration Phase** | July 24, 2026 | **Planned** | Merging feature branches, resolve dependency conflicts, and run regression tests. |
-| **📦 Final Release** | July 25, 2026 | **Planned** | Delivery of compiled PDF specifications, live presentation, and deployment. |
-
----
-
-## 📘 Compiled Specifications (PDFs)
-
-Exactly **13 enterprise-grade PDF handbooks** are available inside the [docs/PDF/](docs/PDF/) directory to guide developers and project leads:
-
-<details>
-<summary><b>🔍 Expand Team-Specific Packages</b></summary>
-
-1. 📂 **[01-Team-Project-Management.pdf](docs/PDF/01-Team-Project-Management.pdf)**: Project workflow coordination, timelines, and release schedules.
-2. 🔬 **[02-Team-Data-Profiling.pdf](docs/PDF/02-Team-Data-Profiling.pdf)**: Ingestion requirements, validation parameters, and type parsing.
-3. 📈 **[03-Team-EDA.pdf](docs/PDF/03-Team-EDA.pdf)**: Data visualizations, distributions, and correlation maps.
-4. ⚙️ **[04-Team-Preprocessing.pdf](docs/PDF/04-Team-Preprocessing.pdf)**: Imputation strategies, outlier rules, and categorical encoding.
-5. 🤖 **[05-Team-Modeling.pdf](docs/PDF/05-Team-Modeling.pdf)**: Random Forest modeling architectures and hyperparameter specs.
-6. 📊 **[06-Team-Evaluation.pdf](docs/PDF/06-Team-Evaluation.pdf)**: Core ML validation metrics and business recommendation engines.
-7. 🖥️ **[07-Team-Dashboard.pdf](docs/PDF/07-Team-Dashboard.pdf)**: Streamlit UI components, session state, and export tools.
-
-</details>
-
-<details>
-<summary><b>🏗️ Expand Project Architecture & Handbooks</b></summary>
-
-* 📘 **[Project-Handbook.pdf](docs/PDF/Project-Handbook.pdf)**: Organizational team leads, roadmap, and contact lists.
-* 💻 **[Developer-Handbook.pdf](docs/PDF/Developer-Handbook.pdf)**: Development environment instructions and code review policies.
-* 🏗️ **[Architecture.pdf](docs/PDF/Architecture.pdf)**: In-depth package boundary maps and data payload flows.
-* 🧩 **[Integration-Guide.pdf](docs/PDF/Integration-Guide.pdf)**: Module interfaces, regression safety, and PR integration protocols.
-* 🚀 **[Deployment-Guide.pdf](docs/PDF/Deployment-Guide.pdf)**: Streamlit hosting guides, Docker configurations, and containerization.
-* 🐙 **[Git-Workflow.pdf](docs/PDF/Git-Workflow.pdf)**: Branch naming rules, semantic commit standards, and PR template guidelines.
-
-</details>
+| Tool Name | Category | Primary Function |
+| :--- | :--- | :--- |
+| `load_dataset` | Data Loading | Ingest CSV, Parquet, and Excel files into typed DataFrames |
+| `profile_dataset` | Profiling | Compute dataset dimensions, duplicate rows, missing cell counts, and health score |
+| `missingness_report` | Profiling | Granular per-column missing percentage and pattern diagnosis |
+| `distribution_analysis` | EDA | Compute mean, median, standard deviation, skewness, and quantiles |
+| `correlation_analysis` | EDA | Calculate Pearson and Spearman correlation matrices across numeric fields |
+| `outlier_detection` | EDA | Multi-method outlier detection (IQR, Z-score, Isolation Forest) |
+| `generate_preprocessing_plan` | Preprocessing | Formulate optimal cleaning, imputation, and encoding strategies |
+| `execute_cleaning` | Preprocessing | Apply median/mode imputation, duplicate removal, and outlier clipping |
+| `encode_features` | Preprocessing | Transform categorical features using One-Hot Encoding with cardinality guards |
+| `infer_ml_task` | Modeling | Auto-detect binary classification, multiclass, or regression tasks |
+| `benchmark_models` | Modeling | Train Random Forest, Gradient Boosting, Ridge, Logistic Regression with k-fold CV |
+| `evaluate_model` | Evaluation | Compute Accuracy, Precision, Recall, F1, ROC-AUC, RMSE, MAE, R² on holdout set |
+| `calculate_feature_importances` | Evaluation | Extract Gini and Permutation feature importances |
+| `compile_report` | Reporting | Generate Cyber Dark interactive HTML, Markdown, and JSON executive reports |
+| `detect_drift` | Monitoring | Statistical drift detection comparing baseline vs inference distributions |
 
 ---
 
-## 💻 Developer Onboarding
+## 💻 Setup & Quickstart
 
-### 1. Prerequisites
-Ensure you have **Python 3.10+** installed on your system.
+### Prerequisites
+- **Python 3.10+** (Python 3.10, 3.11, 3.12, 3.13, 3.14 supported)
+- **Node.js 18+** & **npm**
+- *(Optional)* **Docker** & **Docker Compose**
 
-### 2. Installation & Virtual Environment Setup
-Clone the repository and set up a clean Python virtual environment:
+### 1. Clone & Environment Setup
+
 ```bash
 git clone https://github.com/GhariebML/AutoAnalyst-AI.git
 cd AutoAnalyst-AI
+
+# Create virtual environment
 python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install backend dependencies
+pip install -e ".[dev]"
+
+# Configure Environment Variables
+cp .env.example .env
 ```
 
-Activate the environment:
-* **Windows (PowerShell)**:
-  ```powershell
-  .venv\Scripts\Activate.ps1
-  ```
-* **macOS / Linux**:
-  ```bash
-  source .venv/bin/activate
-  ```
-
-Install requirements and configure the project in editable mode:
-```bash
-pip install -r requirements.txt
-pip install -e .
-```
-
-### 3. Launching the Streamlit Interface
-Start the interactive dashboard locally:
-```bash
-streamlit run app/streamlit_app.py
-```
-
-### 4. Running Regression Tests
-Validate changes using the automated pytest suite:
-```bash
-pytest
+Edit `.env` to configure your OpenRouter API key:
+```ini
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+DEFAULT_LLM_MODEL=openai/gpt-4o-mini
+FALLBACK_LLM_MODEL=anthropic/claude-3.5-haiku
+DATABASE_URL=sqlite:///./autoanalyst.db
 ```
 
 ---
 
-## 🐙 Git Flow & Code Review Policies
+### 2. Launch Local Development Servers
 
-To guarantee branch isolation and system stability, the repository enforces a strict merge protocol:
+#### Terminal 1 — FastAPI Backend API:
+```bash
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+*API Swagger documentation available at: `http://localhost:8000/docs`*
 
-- **Branch Separation**: All active code development must take place on dedicated feature branches (e.g., `feature/data-profiling`).
-- **PR Approval**: Pull requests must target the `develop` branch and require review and approval from **Team 1 (Project Management)** before integration.
-- **Commit Messages**: Commits must start with semantic tags (`feat:`, `fix:`, `docs:`, `test:`, or `refactor:`).
+#### Terminal 2 — React TypeScript Frontend:
+```bash
+cd frontend
+npm install
+npm run dev -- --port 3001 --host
+```
+*Web Application UI available at: `http://localhost:3001`*
+
+#### *(Optional)* Terminal 3 — Streamlit Legacy Interface:
+```bash
+python -m streamlit run app/streamlit_app.py --server.port 8502
+```
 
 ---
 
-## 👥 Contributors & Core Organization
+### 3. Docker Compose (One-Click Deployment)
+
+```bash
+docker-compose up --build -d
+```
+- **Web App UI**: `http://localhost:3000`
+- **FastAPI Backend**: `http://localhost:8000`
+
+---
+
+## 📡 API Endpoints & Telemetry
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/dashboard/summary` | Aggregate platform statistics (total runs, datasets, models, health score) |
+| `GET` | `/api/v1/dashboard/runs-timeline` | Time-series analysis run frequencies (7D, 30D, 90D) |
+| `GET` | `/api/v1/dashboard/agents-activity` | Multi-agent execution counts, success rates, and tool latencies |
+| `GET` | `/api/v1/system/health` | Multi-subsystem health diagnostics (SQLite, Storage, LLM Gateway, Orchestrator) |
+| `GET` | `/api/v1/system/llm/health` | Centralized OpenRouter status, model routing, and token telemetry |
+| `GET` | `/api/v1/system/tools` | Complete 15-tool analytical catalog with parameter schemas |
+| `POST` | `/api/v1/datasets` | Upload and profile tabular dataset files (multipart/form-data) |
+| `GET` | `/api/v1/datasets/{id}/preview` | Retrieve dataset schema, column types, and data preview rows |
+| `POST` | `/api/v1/analyses` | Launch autonomous multi-agent analysis run |
+| `GET` | `/api/v1/runs/{id}/events` | **Server-Sent Events (SSE)** real-time agent lifecycle and tool stream |
+| `POST` | `/api/v1/runs/{id}/approve` | Human-In-The-Loop (HITL) plan approval / modification |
+| `GET` | `/api/v1/artifacts/{id}/download` | Download compiled reports (`format=html`, `format=json`, `format=csv`) |
+| `POST` | `/api/v1/chat` | Context-aware AI Analyst Copilot query endpoint |
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+AutoAnalyst AI maintains a strict automated test suite with full coverage validation:
+
+```bash
+# Run pytest test suite across all 219 tests
+python -m pytest
+
+# Run Ruff linter and code style checks
+ruff check .
+
+# Run Frontend Typecheck and Production Build
+cd frontend && npm run build
+```
+
+### Benchmark Metrics:
+- **Total Tests**: `219 passed`
+- **Code Coverage**: `84.47%` *(minimum required: 70%)*
+- **Lint Errors**: `0`
+- **Frontend Build**: `1,598 modules transformed in 1.67s (0 errors)`
+
+---
+
+## 📂 Repository Structure
 
 ```text
-PM & Integration (Team 1)    ───► Mohamed Gharieb (Lead), Mohamed Abd Elkhalek
-Data Profiling (Team 2)       ───► Aya Emad (Lead), Aya Mostafa
-EDA & Visuals (Team 3)        ───► Mohamed Kamal (Lead), Yomna Ashraf, Samar Mahmoud
-Preprocessing (Team 4)        ───► Basma Mansour (Lead), Bothaina Elqady
-Machine Learning (Team 5)     ───► Mohamed Khaled El-Shayp (Lead), Ahmed Gamal
-Evaluation & Insights (Team 6)───► Youssef Al-komi (Lead), Sohad Abd El-Mohsen
-Dashboard & Reporting (Team 7) ───► Hazem (Lead), Mahmoud Maher
+AutoAnalyst-AI/
+├── backend/                       # FastAPI enterprise backend
+│   ├── app/
+│   │   ├── api/v1/               # REST routers (dashboard, analyses, runs, datasets, system, chat)
+│   │   ├── core/                 # Config, settings, and event emitters
+│   │   ├── models/               # SQLAlchemy SQLite database models
+│   │   ├── schemas/              # Pydantic request/response schemas
+│   │   ├── services/             # Orchestrator, dataset, and chat business logic
+│   │   └── main.py               # FastAPI application entrypoint
+│   └── tests/                    # Backend API endpoint test suite
+├── frontend/                      # React 19 + TypeScript + Tailwind CSS
+│   ├── src/
+│   │   ├── api/                  # Typed API client and SSE subscriber
+│   │   ├── components/           # Dashboard, DatasetHub, AgentMonitor, AnalyticsWorkspace, SystemHealthView
+│   │   │   ├── charts/           # ConfusionMatrix, CorrelationHeatmap, FeatureImportance
+│   │   │   └── common/           # MetricCard, DataLineageDiagram, RunPerformanceCard, LoadingSkeleton
+│   │   ├── types/                # Core TypeScript interfaces
+│   │   ├── App.tsx               # Main application shell & tab routing
+│   │   └── index.css             # Cyber Dark design system tokens
+│   └── vite.config.ts            # Vite build configuration
+├── src/autoanalyst/               # Core Python multi-agent analytics engine
+│   ├── agents/                   # Autonomous agents (profiling, eda, prep, ml, eval, report, supervisor)
+│   ├── llm/                      # Centralized OpenRouter provider, router, tracker, service
+│   ├── tools/                    # 15 deterministic analytical tools
+│   ├── data_profiling/           # Schema and quality profiling
+│   ├── eda/                      # Statistical analysis and correlations
+│   ├── preprocessing/            # Adaptive cleaning and imputation
+│   ├── feature_engineering/      # Encoders and polynomial features
+│   ├── modeling/                 # Classification and regression model zoos
+│   ├── evaluation/               # Model diagnostics and metrics
+│   ├── reporting/                # Cyber Dark Chart.js HTML and JSON report generation
+│   └── pipeline.py               # Synchronous pipeline runner
+├── tests/                         # Comprehensive unit and integration test suite (219 tests)
+├── docs/Assets/                   # Visual architecture diagrams and hero banners
+├── docker-compose.yml             # Full-stack container orchestration
+├── Dockerfile                     # Multi-stage container build
+└── pyproject.toml                 # Package configuration and dependencies
 ```
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+
+---
+
+<div align="center">
+  <b>Built with ❤️ by the AutoAnalyst AI Team</b><br>
+  <sub>Autonomous Multi-Agent Data Intelligence & Machine Learning</sub>
+</div>
