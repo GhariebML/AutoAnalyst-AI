@@ -28,6 +28,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
         'What are the strongest correlations in this dataset?',
         'Why was the champion ML model chosen over others?',
         'Which features have the highest predictive leverage?',
+        'What data quality risks or anomalies should be addressed?',
       ],
     },
   ]);
@@ -68,7 +69,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
         {
           role: 'assistant',
           sender: 'assistant',
-          content: 'Apologies, I encountered an error querying the dataset context. Please try again.',
+          content: 'Apologies, I encountered an error querying the dataset context. Please verify the backend connection and try again.',
           text: 'Error querying dataset.',
           timestamp: new Date().toISOString(),
         },
@@ -85,7 +86,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
   };
 
   return (
-    <div className="glass-panel rounded-3xl border border-slate-800 flex flex-col h-[520px] overflow-hidden shadow-2xl animate-fadeIn">
+    <div className="glass-panel rounded-3xl border border-slate-800 flex flex-col h-[540px] overflow-hidden shadow-2xl animate-fadeIn">
       {/* Copilot Header */}
       <div className="px-5 py-3.5 border-b border-slate-800 bg-slate-950/70 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -104,7 +105,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
         </div>
 
         <div className="text-[11px] font-mono text-slate-400">
-          Run: <span className="text-slate-200">{analysisId ? `#${analysisId.slice(0, 8)}` : 'None'}</span>
+          Run: <span className="text-slate-200 font-bold">{analysisId ? `#${analysisId.slice(0, 8)}` : 'None'}</span>
         </div>
       </div>
 
@@ -128,7 +129,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
                 {isUser ? <User className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
               </div>
 
-              <div className={`space-y-2 max-w-[82%] ${isUser ? 'items-end' : 'items-start'}`}>
+              <div className={`space-y-2 max-w-[84%] ${isUser ? 'items-end' : 'items-start'}`}>
                 <div
                   className={`p-3.5 rounded-2xl text-xs leading-relaxed relative group ${
                     isUser
@@ -136,7 +137,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
                       : 'bg-slate-900/90 text-slate-200 border border-slate-800 rounded-tl-none'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{messageText}</p>
+                  <div className="whitespace-pre-wrap font-sans">{messageText}</div>
 
                   {!isUser && (
                     <button
@@ -156,9 +157,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ analysisId }) => {
                       <button
                         key={sIdx}
                         onClick={() => handleSend(sug)}
-                        className="px-2.5 py-1 rounded-lg text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-850 text-indigo-300 transition-all text-left flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-lg text-[10px] bg-slate-900 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800 text-indigo-300 transition-all text-left flex items-center gap-1 group"
                       >
-                        <Zap className="w-2.5 h-2.5 text-indigo-400 shrink-0" />
+                        <Zap className="w-2.5 h-2.5 text-indigo-400 group-hover:scale-110 transition-transform shrink-0" />
                         <span>{sug}</span>
                       </button>
                     ))}
