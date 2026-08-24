@@ -16,7 +16,7 @@ import { Dataset, AnalysisRun } from '../types';
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (tab: 'dashboard' | 'datasets' | 'workspace' | 'exports') => void;
+  onNavigate: (tab: 'dashboard' | 'datasets' | 'workspace' | 'analytics' | 'playground' | 'exports' | 'health') => void;
   datasets: Dataset[];
   analyses: AnalysisRun[];
   onSelectDataset: (id: string) => void;

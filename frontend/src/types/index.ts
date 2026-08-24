@@ -60,17 +60,16 @@ export interface AnalysisRun {
   dataset_id: string;
   target_column?: string;
   model_task?: string;
-  status: 'pending' | 'running' | 'paused_for_approval' | 'paused_hitl' | 'completed' | 'failed';
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused_hitl';
   champion_model_name?: string;
   champion_score?: number;
   executive_summary?: string;
   insights?: string[];
   findings?: AgentFinding[];
   profile?: Record<string, any>;
-  evaluation?: Record<string, any>;
+  eda_results?: Record<string, any>;
   model_results?: Record<string, any>;
   evaluation_results?: Record<string, any>;
-  eda_results?: Record<string, any>;
   duration_ms?: number;
   report_path?: string;
   created_at: string;
@@ -78,12 +77,11 @@ export interface AnalysisRun {
 
 export interface ChatMessage {
   id?: string;
-  role?: 'user' | 'assistant';
+  role: 'user' | 'assistant';
   sender?: 'user' | 'assistant';
-  content?: string;
+  content: string;
   text?: string;
-  timestamp: string;
-  source?: string;
+  timestamp?: string;
   suggested_followups?: string[];
 }
 
@@ -145,4 +143,30 @@ export interface FullSystemHealth {
     total_requests: number;
   };
   timestamp: string;
+}
+
+export interface FeatureSchemaItem {
+  name: string;
+  dtype: string;
+  is_numeric: boolean;
+  min_value?: number;
+  max_value?: number;
+  default_value?: any;
+  categories: string[];
+}
+
+export interface ModelSchemaResponse {
+  analysis_id: string;
+  model_name: string;
+  task_type: string;
+  target_column?: string;
+  features: FeatureSchemaItem[];
+}
+
+export interface PredictionResult {
+  prediction: any;
+  prediction_label: string;
+  confidence: number;
+  probabilities?: Record<string, number>;
+  feature_contributions: Array<{ feature: string; weight: number }>;
 }

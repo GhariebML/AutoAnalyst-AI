@@ -4,6 +4,7 @@ import { Dashboard } from './components/Dashboard';
 import { DatasetHub } from './components/DatasetHub';
 import { AgentMonitor } from './components/AgentMonitor';
 import { AnalyticsWorkspace } from './components/AnalyticsWorkspace';
+import { ModelPlayground } from './components/ModelPlayground';
 import { SystemHealthView } from './components/SystemHealthView';
 import { ChatPanel } from './components/ChatPanel';
 import { ExportCenter } from './components/ExportCenter';
@@ -11,7 +12,7 @@ import { HITLApprovalModal } from './components/HITLApprovalModal';
 import { CommandPalette } from './components/CommandPalette';
 import {
   fetchDatasets,
-  fetchAnalyses,
+  fetchAllAnalyses,
   fetchAnalysis,
   createAnalysis,
   approveHITLPlan,
@@ -58,124 +59,175 @@ export const App: React.FC = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [dsData, anlData] = await Promise.all([fetchDatasets(), fetchAnalyses()]);
+        const [dsData, anlData] = await Promise.all([fetchDatasets(), fetchAllAnalyses()]);
         setDatasets(dsData);
         setAnalyses(anlData);
         if (anlData.length > 0) {
-          const latest = await fetchAnalysis(anlData[0].id);
-          setCurrentAnalysis(latest);
+          setCurrentAnalysis(anlData[0]);
         }
       } catch (err) {
-        console.error('Failed to load initial data:', err);
+        console.error('Failed to load initial workspace data:', err);
       }
     };
     loadInitialData();
   }, []);
 
-  // Launch Analysis
-  const handleLaunchAnalysis = async (datasetId: string, targetCol?: string) => {
+  // Poll analysis details until completed
+  useEffect(() => {
+    if (!isRunning || !activeRunId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const updated = await fetchAnalysis(activeRunId);
+        if (updated) {
+          setCurrentAnalysis(updated);
+          if (updated.status === 'completed' || updated.status === 'failed') {
+            setIsRunning(false);
+            setRunStatus(updated.status);
+            // Refresh history
+            const freshHistory = await fetchAllAnalyses();
+            setAnalyses(freshHistory);
+            clearInterval(interval);
+          }
+        }
+      } catch (err) {
+        console.error('Error polling analysis state:', err);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isRunning, activeRunId]);
+
+  // Subscribe to SSE events
+  useEffect(() => {
+    if (!activeRunId) return;
+
+    const unsubscribe = subscribeToRunEvents(
+      activeRunId,
+      (event) => {
+        setEvents((prev) => [
+          {
+            type: event.type,
+            message: event.message || `Event: ${event.type}`,
+            timestamp: event.timestamp || new Date().toISOString(),
+            data: event.data,
+          },
+          ...prev,
+        ]);
+
+        if (event.type === 'AGENT_STARTED' && event.agent_name) {
+          setCurrentAgent(event.agent_name);
+          setAgentTelemetry((prev) => ({
+            ...prev,
+            [event.agent_name]: {
+              agent_name: event.agent_name,
+              status: 'active',
+              duration_ms: 0,
+            },
+          }));
+        } else if (event.type === 'AGENT_COMPLETED' && event.agent_name) {
+          setAgentTelemetry((prev) => ({
+            ...prev,
+            [event.agent_name]: {
+              agent_name: event.agent_name,
+              status: 'completed',
+              duration_ms: event.data?.duration_ms || 0,
+              actions_taken: event.data?.actions_taken || [],
+              findings: event.data?.findings || [],
+              recommendations: event.data?.recommendations || [],
+            },
+          }));
+        } else if (event.type === 'HITL_PAUSED') {
+          setIsHITLModalOpen(true);
+          setHitlPrompt(event.data?.prompt || 'Human approval required to proceed with data transformations.');
+          setRunStatus('paused_hitl');
+        } else if (event.type === 'RUN_COMPLETED') {
+          setIsRunning(false);
+          setRunStatus('completed');
+          fetchAnalysis(activeRunId).then((fullRun) => {
+            if (fullRun) setCurrentAnalysis(fullRun);
+          });
+        }
+      },
+      (err) => console.error('SSE Error:', err)
+    );
+
+    return () => unsubscribe();
+  }, [activeRunId]);
+
+  const handleStartAnalysis = async (datasetId: string, targetCol?: string) => {
     try {
       setIsRunning(true);
       setRunStatus('running');
       setEvents([]);
       setAgentTelemetry({});
+
+      const newRun = await createAnalysis(datasetId, targetCol);
+      setActiveRunId(newRun.id);
+      setCurrentAnalysis(newRun);
       setActiveTab('workspace');
 
-      const run = await createAnalysis(datasetId, targetCol || undefined, 'full');
-      setActiveRunId(run.id);
-
-      // Subscribe to live SSE events
-      subscribeToRunEvents(
-        run.id,
-        (event) => {
-          setEvents((prev) => [...prev, event]);
-
-          if (event.type === 'AGENT_STARTED') {
-            setCurrentAgent(event.agent_name || null);
-          } else if (event.type === 'AGENT_COMPLETED' && event.agent_name) {
-            setAgentTelemetry((prev) => ({
-              ...prev,
-              [event.agent_name]: {
-                agent_name: event.agent_name,
-                status: 'completed',
-                duration_ms: event.data?.duration_ms || 1000,
-                actions_taken: event.data?.actions_taken || [],
-                findings: event.data?.findings || [],
-                recommendations: event.data?.recommendations || [],
-              },
-            }));
-          } else if (event.type === 'HITL_PAUSED') {
-            setRunStatus('paused_hitl');
-            setHitlPrompt(event.data?.human_prompt || null);
-            setIsHITLModalOpen(true);
-          } else if (event.type === 'RUN_COMPLETED') {
-            setIsRunning(false);
-            setRunStatus('completed');
-            setCurrentAgent(null);
-            // Refresh analysis run and history
-            fetchAnalysis(run.id).then((full) => {
-              setCurrentAnalysis(full);
-              fetchAnalyses().then(setAnalyses);
-            });
-          } else if (event.type === 'RUN_FAILED') {
-            setIsRunning(false);
-            setRunStatus('failed');
-            setCurrentAgent(null);
-          }
-        },
-        (error) => {
-          console.error('SSE Error:', error);
-          setIsRunning(false);
-        }
-      );
-    } catch (err) {
-      console.error('Launch Error:', err);
+      // Refresh list
+      const freshHistory = await fetchAllAnalyses();
+      setAnalyses(freshHistory);
+    } catch (err: any) {
+      console.error('Failed to trigger analysis run:', err);
       setIsRunning(false);
+      setRunStatus('failed');
+      alert(`Execution Failed: ${err.message}`);
     }
   };
 
-  // HITL Approval submission
   const handleHITLApprove = async (approved: boolean, modifications?: Record<string, any>) => {
     if (!activeRunId) return;
     try {
-      await approveHITLPlan(activeRunId, approved, modifications);
-      setRunStatus('running');
-      setIsHITLModalOpen(false);
+      if (approved) {
+        await approveHITLPlan(activeRunId, modifications);
+        setIsHITLModalOpen(false);
+        setRunStatus('running');
+      } else {
+        setIsHITLModalOpen(false);
+        setIsRunning(false);
+        setRunStatus('failed');
+      }
     } catch (err) {
-      console.error('Approval Error:', err);
+      console.error('HITL approval error:', err);
     }
   };
 
-  const handleOpenAnalysis = async (anlId: string) => {
+  const handleOpenAnalysisById = async (id: string) => {
     try {
-      const full = await fetchAnalysis(anlId);
-      setCurrentAnalysis(full);
-      setActiveTab('analytics');
+      const found = analyses.find((a) => a.id === id) || (await fetchAnalysis(id));
+      if (found) {
+        setCurrentAnalysis(found);
+        setActiveRunId(found.id);
+        setActiveTab('analytics');
+      }
     } catch (err) {
-      console.error('Failed to open analysis:', err);
+      console.error('Failed to open analysis by id:', err);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background-darkest text-slate-100 flex flex-col bg-grid-pattern bg-radial-gradient">
-      {/* Top Navbar */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+      {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         isRunning={isRunning}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        activeDatasetName={datasets.find((d) => d.id === currentAnalysis?.dataset_id)?.filename}
+        activeDatasetName={currentAnalysis?.dataset_id}
         activeRunId={currentAnalysis?.id}
       />
 
-      {/* Main Content Area */}
+      {/* Main Workspace Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && (
           <Dashboard
-            datasets={datasets}
             analyses={analyses}
-            onSelectDataset={() => setActiveTab('datasets')}
-            onOpenAnalysis={handleOpenAnalysis}
+            datasets={datasets}
+            onSelectDataset={(_id) => setActiveTab('datasets')}
+            onOpenAnalysis={handleOpenAnalysisById}
             onNewAnalysis={() => setActiveTab('datasets')}
           />
         )}
@@ -184,12 +236,12 @@ export const App: React.FC = () => {
           <DatasetHub
             datasets={datasets}
             onDatasetUploaded={(newDs) => setDatasets((prev) => [newDs, ...prev])}
-            onLaunchAnalysis={handleLaunchAnalysis}
+            onLaunchAnalysis={handleStartAnalysis}
           />
         )}
 
         {activeTab === 'workspace' && (
-          <div className="space-y-8">
+          <div className="space-y-6 animate-fadeIn">
             <AgentMonitor
               currentAgent={currentAgent}
               agentTelemetry={agentTelemetry}
@@ -204,6 +256,17 @@ export const App: React.FC = () => {
 
         {activeTab === 'analytics' && (
           <AnalyticsWorkspace analysis={currentAnalysis} />
+        )}
+
+        {activeTab === 'playground' && (
+          <ModelPlayground
+            currentAnalysis={currentAnalysis}
+            analyses={analyses}
+            onSelectAnalysis={(a) => {
+              setCurrentAnalysis(a);
+              setActiveRunId(a.id);
+            }}
+          />
         )}
 
         {activeTab === 'exports' && <ExportCenter analysis={currentAnalysis} />}
@@ -229,8 +292,8 @@ export const App: React.FC = () => {
         onNavigate={(tab) => setActiveTab(tab as NavTab)}
         datasets={datasets}
         analyses={analyses}
-        onSelectDataset={() => setActiveTab('datasets')}
-        onOpenAnalysis={handleOpenAnalysis}
+        onSelectDataset={(_id) => setActiveTab('datasets')}
+        onOpenAnalysis={handleOpenAnalysisById}
         onTriggerQuickRun={() => setActiveTab('datasets')}
       />
 

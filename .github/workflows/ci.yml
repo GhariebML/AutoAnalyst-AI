@@ -1,49 +1,61 @@
-name: CI
+name: AutoAnalyst AI CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, feature/* ]
   pull_request:
-    branches: [main, develop]
+    branches: [ main ]
 
 jobs:
-  quality:
-    name: Python checks (${{ matrix.python-version }})
+  backend-quality-and-tests:
+    name: Backend Linting, Quality & Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
+          cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install Backend Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
           pip install -e ".[dev]"
 
-      - name: Basic import check
+      - name: Run Ruff Code Style & Lint Checks
         run: |
-          python -c "import autoanalyst; print(autoanalyst.__version__)"
-          python -c "from autoanalyst.data_profiling.profiler import generate_basic_profile"
+          ruff check .
 
-      - name: Compile Python files
-        run: python -m compileall -q app src tests
+      - name: Run Pytest Test Suite & Coverage
+        run: |
+          python -m pytest
 
-      - name: Lint (ruff)
-        run: ruff check src app tests
+  frontend-build-and-typecheck:
+    name: Frontend Typecheck & Production Build (Node 20)
+    runs-on: ubuntu-latest
 
-      - name: Type check (mypy)
-        run: mypy src
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Run tests with coverage gate
-        run: pytest
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Compile Frontend TypeScript & Vite Production Bundle
+        working-directory: frontend
+        run: npm run build

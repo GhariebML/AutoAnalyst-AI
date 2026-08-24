@@ -8,9 +8,10 @@ import {
   Search,
   Activity,
   BrainCircuit,
+  Sliders,
 } from 'lucide-react';
 
-export type NavTab = 'dashboard' | 'datasets' | 'workspace' | 'analytics' | 'exports' | 'health';
+export type NavTab = 'dashboard' | 'datasets' | 'workspace' | 'analytics' | 'playground' | 'exports' | 'health';
 
 interface NavbarProps {
   activeTab: NavTab;
@@ -104,6 +105,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            onClick={() => onSelectTab('playground')}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'playground'
+                ? 'bg-indigo-600 text-white shadow-glow-indigo'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+            }`}
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Simulator</span>
+          </button>
+
+          <button
             onClick={() => onSelectTab('exports')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'exports'
@@ -112,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Reports & Export</span>
+            <span>Reports</span>
           </button>
 
           <button
@@ -128,27 +141,29 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </nav>
 
-        {/* Right Section: Command Palette Trigger & System Pill */}
+        {/* Right Actions (Command Palette trigger & status) */}
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenCommandPalette}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-xs text-slate-400 hover:text-slate-200 transition-all font-mono shadow-sm"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all text-xs font-medium"
           >
-            <Search className="w-3.5 h-3.5 text-slate-500" />
-            <span>Search & Commands</span>
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-400 border border-slate-700">
-              Ctrl K
+            <Search className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">Search & Actions</span>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-400 border border-slate-700">
+              Ctrl+K
             </kbd>
           </button>
 
-          {/* Engine Status Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono">
+          {/* Engine Status Indicator */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
             <span
               className={`w-2 h-2 rounded-full ${
-                isRunning ? 'bg-cyan-400 animate-pulse shadow-glow-cyan' : 'bg-emerald-400 shadow-glow-emerald'
+                isRunning ? 'bg-cyan-400 animate-ping' : 'bg-emerald-400'
               }`}
             ></span>
-            <span className="text-slate-300 font-semibold">{isRunning ? 'Agents Running' : 'Engine Ready'}</span>
+            <span className="text-[11px] font-mono font-medium text-slate-300 hidden md:inline">
+              {isRunning ? 'Orchestrating' : 'Operational'}
+            </span>
           </div>
         </div>
       </div>

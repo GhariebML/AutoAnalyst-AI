@@ -1,4 +1,4 @@
-import { Dataset, DatasetPreview, AnalysisRun } from '../types';
+import { Dataset, DatasetPreview, AnalysisRun, ModelSchemaResponse, PredictionResult } from '../types';
 
 const API_BASE = '/api/v1';
 
@@ -58,41 +58,33 @@ export async function fetchAnalysisRun(analysisId: string): Promise<AnalysisRun>
   return res.json();
 }
 
-export async function fetchAnalyses(): Promise<AnalysisRun[]> {
+export async function fetchAllAnalyses(): Promise<AnalysisRun[]> {
   const res = await fetch(`${API_BASE}/analyses`);
-  if (!res.ok) throw new Error('Failed to fetch analyses');
+  if (!res.ok) throw new Error('Failed to fetch analysis history');
   return res.json();
 }
 
-export async function approveHITL(
-  runId: string,
-  approved: boolean,
-  _modifications?: Record<string, any>
-): Promise<AnalysisRun> {
+export async function approveHITL(runId: string, modifications?: Record<string, any>): Promise<any> {
   const res = await fetch(`${API_BASE}/runs/${runId}/approve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ step: 'cleaning', approved }),
+    body: JSON.stringify({ approved: true, modifications }),
   });
-  if (!res.ok) throw new Error('Failed to submit approval');
+  if (!res.ok) throw new Error('Failed to approve execution');
   return res.json();
 }
 
 export async function sendChatMessage(
   analysisId: string,
   query: string
-): Promise<{ response: string; source: string; suggested_followups: string[]; timestamp?: string }> {
+): Promise<{ response: string; timestamp?: string; suggested_followups?: string[] }> {
   const res = await fetch(`${API_BASE}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ analysis_id: analysisId, query }),
   });
-  if (!res.ok) throw new Error('Failed to send chat query');
-  const data = await res.json();
-  return {
-    ...data,
-    timestamp: data.timestamp || new Date().toISOString(),
-  };
+  if (!res.ok) throw new Error('Failed to send chat message');
+  return res.json();
 }
 
 export function subscribeToRunEvents(
@@ -158,5 +150,27 @@ export async function fetchFullSystemHealth() {
 export async function fetchLLMHealth() {
   const res = await fetch(`${API_BASE}/system/llm/health`);
   if (!res.ok) throw new Error('Failed to fetch LLM health');
+  return res.json();
+}
+
+export async function fetchModelSchema(analysisId: string): Promise<ModelSchemaResponse> {
+  const res = await fetch(`${API_BASE}/models/${analysisId}/schema`);
+  if (!res.ok) throw new Error('Failed to fetch model schema');
+  return res.json();
+}
+
+export async function predictModelRecord(
+  analysisId: string,
+  inputs: Record<string, any>
+): Promise<PredictionResult> {
+  const res = await fetch(`${API_BASE}/models/${analysisId}/predict`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ inputs }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || 'Prediction failed');
+  }
   return res.json();
 }
