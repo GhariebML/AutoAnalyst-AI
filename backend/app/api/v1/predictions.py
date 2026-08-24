@@ -67,39 +67,88 @@ def get_model_schema(analysis_id: str, db: Session = Depends(get_db)) -> ModelSc
     if not dataset:
         raise HTTPException(status_code=404, detail="Associated dataset not found")
 
+    # Load dataset to extract precise bounds & categories reliably
+    df: pd.DataFrame | None = None
+    if dataset.file_path:
+        try:
+            if dataset.file_path.endswith(".csv"):
+                df = pd.read_csv(dataset.file_path)
+            elif dataset.file_path.endswith((".parquet", ".pq")):
+                df = pd.read_parquet(dataset.file_path)
+            elif dataset.file_path.endswith((".xlsx", ".xls")):
+                df = pd.read_excel(dataset.file_path)
+        except Exception as exc:
+            logger.warning("Could not read dataset file directly: %s", exc)
+
     profile = json.loads(run.profile_json) if run.profile_json else {}
-    eda = json.loads(run.eda_json) if getattr(run, "eda_json", None) else {}
-    col_profiles = profile.get("columns", {})
-    summary_stats = eda.get("summary_statistics", {})
+    col_profiles = profile.get("column_profiles")
+    if not isinstance(col_profiles, dict):
+        col_profiles = profile.get("columns") if isinstance(profile.get("columns"), dict) else {}
 
     features: list[FeatureSchemaItem] = []
-    for col_name, p in col_profiles.items():
-        if col_name == run.target_column:
-            continue
 
-        dtype_str = p.get("inferred_type", "numeric")
-        is_num = dtype_str in ["integer", "float", "numeric"]
-        stat = summary_stats.get(col_name, {})
+    if df is not None:
+        for col_name in df.columns:
+            if col_name == run.target_column:
+                continue
 
-        min_val = float(stat.get("min")) if "min" in stat and stat["min"] is not None else (0.0 if is_num else None)
-        max_val = float(stat.get("max")) if "max" in stat and stat["max"] is not None else (100.0 if is_num else None)
-        default_val = float(stat.get("mean")) if "mean" in stat and stat["mean"] is not None else (min_val or 0)
+            series = df[col_name]
+            is_num = bool(pd.api.types.is_numeric_dtype(series))
 
-        features.append(
-            FeatureSchemaItem(
-                name=col_name,
-                dtype=dtype_str,
-                is_numeric=is_num,
-                min_value=min_val,
-                max_value=max_val,
-                default_value=default_val,
-                categories=p.get("sample_values", []) if not is_num else [],
+            if is_num:
+                s_clean = series.dropna()
+                min_v = float(s_clean.min()) if not s_clean.empty else 0.0
+                max_v = float(s_clean.max()) if not s_clean.empty else 100.0
+                mean_v = float(s_clean.mean()) if not s_clean.empty else min_v
+
+                if min_v == max_v:
+                    max_v = min_v + 10.0
+
+                features.append(
+                    FeatureSchemaItem(
+                        name=str(col_name),
+                        dtype="numeric",
+                        is_numeric=True,
+                        min_value=round(min_v, 2),
+                        max_value=round(max_v, 2),
+                        default_value=round(mean_v, 2),
+                        categories=[],
+                    )
+                )
+            else:
+                unique_vals = [str(x) for x in series.dropna().unique()[:25]]
+                features.append(
+                    FeatureSchemaItem(
+                        name=str(col_name),
+                        dtype="categorical",
+                        is_numeric=False,
+                        min_value=None,
+                        max_value=None,
+                        default_value=unique_vals[0] if unique_vals else "Unknown",
+                        categories=unique_vals or ["Default"],
+                    )
+                )
+    else:
+        # Fallback to column profiles JSON
+        for col_name, p in col_profiles.items():
+            if col_name == run.target_column:
+                continue
+            is_num = bool(p.get("is_numeric", True))
+            features.append(
+                FeatureSchemaItem(
+                    name=str(col_name),
+                    dtype="numeric" if is_num else "categorical",
+                    is_numeric=is_num,
+                    min_value=0.0 if is_num else None,
+                    max_value=100.0 if is_num else None,
+                    default_value=50.0 if is_num else "Default",
+                    categories=["Default"] if not is_num else [],
+                )
             )
-        )
 
     return ModelSchemaResponse(
         analysis_id=analysis_id,
-        model_name=run.champion_model_name or "Champion Model",
+        model_name=run.champion_model_name or "RandomForestClassifier",
         task_type=run.model_task or "classification",
         target_column=run.target_column,
         features=features,
@@ -123,13 +172,19 @@ def predict_single_record(
 
     # Load baseline dataset to train/infer
     try:
-        df = pd.read_csv(dataset.file_path) if dataset.file_path.endswith(".csv") else pd.read_parquet(dataset.file_path)
+        if dataset.file_path.endswith(".csv"):
+            df = pd.read_csv(dataset.file_path)
+        elif dataset.file_path.endswith((".parquet", ".pq")):
+            df = pd.read_parquet(dataset.file_path)
+        else:
+            df = pd.read_excel(dataset.file_path)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to read baseline dataset: {exc}")
 
     target_col = run.target_column
     if not target_col or target_col not in df.columns:
-        raise HTTPException(status_code=400, detail="Target column not configured or missing from dataset")
+        # Fallback to last column if configured target is absent
+        target_col = df.columns[-1]
 
     # Prepare features and target
     X = df.drop(columns=[target_col])
@@ -140,7 +195,7 @@ def predict_single_record(
     categorical_cols = X.select_dtypes(exclude=[np.number]).columns.tolist()
 
     for c in numeric_cols:
-        X[c] = X[c].fillna(X[c].median())
+        X[c] = X[c].fillna(X[c].median() if not X[c].dropna().empty else 0)
     for c in categorical_cols:
         X[c] = X[c].fillna(X[c].mode()[0] if not X[c].mode().empty else "missing")
 
@@ -153,7 +208,7 @@ def predict_single_record(
         from sklearn.ensemble import RandomForestRegressor
 
         model = RandomForestRegressor(n_estimators=30, random_state=42)
-        model.fit(X_encoded, y.fillna(y.mean()))
+        model.fit(X_encoded, y.fillna(y.mean() if not y.dropna().empty else 0))
 
         # Format input record
         input_df = pd.DataFrame([payload.inputs])
@@ -202,7 +257,7 @@ def predict_single_record(
 
         return PredictionResult(
             prediction=pred_class,
-            prediction_label=f"Class: {pred_class}",
+            prediction_label=f"Predicted Class: {pred_class}",
             confidence=round(confidence, 3),
             probabilities=prob_dict,
             feature_contributions=[
