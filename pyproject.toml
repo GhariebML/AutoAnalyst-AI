@@ -11,6 +11,9 @@ requires-python = ">=3.10"
 authors = [{ name = "AutoAnalyst AI Contributors" }]
 license = { text = "MIT" }
 
+[project.scripts]
+autoanalyst = "autoanalyst.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
@@ -34,17 +37,18 @@ llm = [
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]
+pythonpath = ["src", "."]
+testpaths = ["tests", "backend/tests"]
 addopts = "--cov=autoanalyst --cov-report=term-missing --cov-fail-under=70"
 
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-src = ["src", "tests", "app"]
+src = ["src", "tests", "backend", "app"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
+ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"

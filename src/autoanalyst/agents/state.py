@@ -9,6 +9,7 @@ partial updates that LangGraph merges. Trace entries are validated
 from __future__ import annotations
 
 import operator
+import uuid
 from typing import Annotated, Any, TypedDict
 
 import pandas as pd
@@ -42,6 +43,12 @@ class AutoAnalystConfig(BaseModel):
     fail_fast: bool = False
     require_approval: bool = False
 
+    # completeness extras (M7)
+    dataset_name: str | None = None
+    enable_memory: bool = False
+    enable_drift: bool = False
+    memory_path: str | None = None
+
 
 APPROVAL_STEPS = frozenset({"cleaning", "modeling"})
 """Graph nodes that support human-in-the-loop approval gates."""
@@ -67,6 +74,15 @@ class AutoAnalystState(TypedDict, total=False):
     fail_fast: bool
     require_approval: bool
     approvals: dict[str, bool]
+
+    # completeness extras (M7)
+    run_id: str
+    dataset_name: str | None
+    enable_memory: bool
+    enable_drift: bool
+    memory_path: str | None
+    drift_report: dict[str, Any] | None
+    run_record_id: str | None
 
     # data frames
     df: pd.DataFrame | None
@@ -99,11 +115,18 @@ class AutoAnalystState(TypedDict, total=False):
 def create_initial_state(config: AutoAnalystConfig) -> AutoAnalystState:
     """Build the starting state for a graph invocation from a config."""
     return AutoAnalystState(
+        run_id=uuid.uuid4().hex,
         dataset_path=config.dataset_path,
         target_column=config.target_column,
         missing_strategy=config.missing_strategy,
         encode_categoricals=config.encode_categoricals,
         report_path=config.report_path,
+        dataset_name=config.dataset_name,
+        enable_memory=config.enable_memory,
+        enable_drift=config.enable_drift,
+        memory_path=config.memory_path,
+        drift_report=None,
+        run_record_id=None,
         max_retries=config.max_retries,
         retry_backoff_seconds=config.retry_backoff_seconds,
         fail_fast=config.fail_fast,

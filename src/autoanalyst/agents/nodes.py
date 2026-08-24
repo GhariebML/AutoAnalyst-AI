@@ -20,6 +20,7 @@ from typing import Any
 
 import pandas as pd
 
+from autoanalyst.agents.drift import detect_drift, drift_warnings
 from autoanalyst.agents.llm import create_llm, load_llm_settings
 from autoanalyst.agents.narrator import advisor_note, executive_summary, narrate_insights
 from autoanalyst.agents.state import AutoAnalystState, NodeRun
@@ -34,6 +35,7 @@ from autoanalyst.agents.tools import (
 )
 from autoanalyst.eda.analyzer import get_correlation_matrix
 from autoanalyst.evaluation.evaluator import evaluate_classification, evaluate_regression
+from autoanalyst.memory.run_store import RunStore, build_run_record, hash_dataframe
 from autoanalyst.modeling.classification import ClassificationModel
 from autoanalyst.modeling.regression import RegressionModel
 
@@ -62,7 +64,10 @@ def _traced(
             if attempt <= max_retries:
                 logger.warning(
                     "Agent node '%s' failed (attempt %d/%d), retrying: %s",
-                    name, attempt, max_retries + 1, exc,
+                    name,
+                    attempt,
+                    max_retries + 1,
+                    exc,
                 )
                 time.sleep(backoff * attempt)
                 continue
@@ -153,6 +158,16 @@ def insight_node(state: AutoAnalystState) -> dict[str, Any]:
 def report_node(state: AutoAnalystState) -> dict[str, Any]:
     """Write the Markdown report when configured."""
     return _traced("report", state, _report_impl)
+
+
+def drift_node(state: AutoAnalystState) -> dict[str, Any]:
+    """Compare this run against the latest previous run of the same dataset."""
+    return _traced("drift", state, _drift_impl)
+
+
+def memory_node(state: AutoAnalystState) -> dict[str, Any]:
+    """Persist a compact record of this run to the local run store."""
+    return _traced("memory", state, _memory_impl)
 
 
 # ----------------------------------------------------------------------
@@ -346,17 +361,62 @@ def _report_impl(state: AutoAnalystState) -> dict[str, Any]:
     if not report_path or not insights:
         return _skipped("report", "no report path configured or no insights generated.")
 
-    written = create_full_report_tool.invoke({
-        "output_path": report_path,
-        "title": "AutoAnalyst AI Agent Report",
-        "profile": state.get("profile") or {},
-        "insights": insights,
-        "missing_report": state.get("missing_values_report"),
-        "eda_results": state.get("eda_results") or {},
-        "cleaning_log": state.get("cleaning_log") or [],
-        "model_results": state.get("model_results"),
-        "evaluation_results": state.get("evaluation_results"),
-        "warnings": state.get("warnings") or [],
-        "executive_summary": state.get("executive_summary"),
-    })
+    written = create_full_report_tool.invoke(
+        {
+            "output_path": report_path,
+            "title": "AutoAnalyst AI Agent Report",
+            "profile": state.get("profile") or {},
+            "insights": insights,
+            "missing_report": state.get("missing_values_report"),
+            "eda_results": state.get("eda_results") or {},
+            "cleaning_log": state.get("cleaning_log") or [],
+            "model_results": state.get("model_results"),
+            "evaluation_results": state.get("evaluation_results"),
+            "warnings": state.get("warnings") or [],
+            "executive_summary": state.get("executive_summary"),
+        }
+    )
     return {"report_path": written}
+
+
+def _drift_impl(state: AutoAnalystState) -> dict[str, Any]:
+    if not state.get("enable_drift"):
+        return _skipped("drift", "disabled by configuration.")
+    df = state.get("df")
+    if df is None:
+        return _skipped("drift", "no DataFrame available from intake.")
+
+    store = RunStore(state.get("memory_path"))
+    reference = store.latest_by_dataset_hash(hash_dataframe(df))
+    if reference is None:
+        return _skipped("drift", "no previous run recorded for this dataset.")
+
+    report = detect_drift(df, reference)
+    update: dict[str, Any] = {"drift_report": report, "warnings": drift_warnings(report)}
+    return update
+
+
+def _memory_impl(state: AutoAnalystState) -> dict[str, Any]:
+    if not state.get("enable_memory"):
+        return _skipped("memory", "disabled by configuration.")
+    df = state.get("df")
+    if df is None:
+        return _skipped("memory", "no DataFrame available from intake.")
+
+    result = _to_pipeline_result_for_memory(state)
+    record = build_run_record(
+        str(state.get("run_id") or ""),
+        df,
+        dataset_name=state.get("dataset_name") or state.get("dataset_path"),
+        target_column=state.get("target_column"),
+        result=result,
+    )
+    RunStore(state.get("memory_path")).append(record)
+    return {"run_record_id": record.run_id}
+
+
+def _to_pipeline_result_for_memory(state: AutoAnalystState) -> Any:
+    """Import-late adapter so memory can reuse the graph's contract mapper."""
+    from autoanalyst.agents.graph import _to_pipeline_result
+
+    return _to_pipeline_result(state)

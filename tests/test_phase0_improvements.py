@@ -70,10 +70,12 @@ class TestHighCardinalityDetection:
 
     def test_auto_detect_categorical(self) -> None:
         """When columns=None, should auto-detect categorical columns."""
-        df = pd.DataFrame({
-            "num": [1, 2, 3, 4, 5],
-            "cat": ["a", "b", "c", "a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "num": [1, 2, 3, 4, 5],
+                "cat": ["a", "b", "c", "a", "b"],
+            }
+        )
         results = detect_high_cardinality_columns(df)
         column_names = [r["column"] for r in results]
         assert "cat" in column_names
@@ -210,11 +212,13 @@ class TestLoggingSmoke:
 
     def test_pipeline_logs(self, caplog) -> None:
         """The full pipeline should emit structured log messages."""
-        df = pd.DataFrame({
-            "age": [25, 32, 32, None],
-            "income": [50000, 65000, 65000, 80000],
-            "city": ["Cairo", "Giza", "Giza", None],
-        })
+        df = pd.DataFrame(
+            {
+                "age": [25, 32, 32, None],
+                "income": [50000, 65000, 65000, 80000],
+                "city": ["Cairo", "Giza", "Giza", None],
+            }
+        )
         with caplog.at_level(logging.INFO):
             run_analysis_pipeline(df)
         log_messages = [r.message for r in caplog.records]
@@ -233,13 +237,16 @@ class TestPandasDeprecationFix:
 
     def test_pipeline_no_select_dtypes_warning(self) -> None:
         """Pipeline should not emit Pandas4Warning about select_dtypes."""
-        df = pd.DataFrame({
-            "age": [25, 32, 41, 29, 36, 45],
-            "income": [50000, 65000, 80000, 52000, 70000, 90000],
-            "city": ["Cairo", "Giza", "Alexandria", "Cairo", "Giza", "Alexandria"],
-            "purchased": ["yes", "no", "yes", "no", "yes", "no"],
-        })
+        df = pd.DataFrame(
+            {
+                "age": [25, 32, 41, 29, 36, 45],
+                "income": [50000, 65000, 80000, 52000, 70000, 90000],
+                "city": ["Cairo", "Giza", "Alexandria", "Cairo", "Giza", "Alexandria"],
+                "purchased": ["yes", "no", "yes", "no", "yes", "no"],
+            }
+        )
         import warnings
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             run_analysis_pipeline(df, PipelineConfig(target_column="purchased", model_task="classification"))
@@ -248,11 +255,14 @@ class TestPandasDeprecationFix:
 
     def test_encode_categorical_with_string_dtype(self) -> None:
         """encode_categorical_columns should handle string dtype columns without warnings."""
-        df = pd.DataFrame({
-            "num": [1, 2, 3, 4],
-            "cat": pd.array(["a", "b", "a", "b"], dtype="string"),
-        })
+        df = pd.DataFrame(
+            {
+                "num": [1, 2, 3, 4],
+                "cat": pd.array(["a", "b", "a", "b"], dtype="string"),
+            }
+        )
         import warnings
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             result = encode_categorical_columns(df, columns=["cat"])

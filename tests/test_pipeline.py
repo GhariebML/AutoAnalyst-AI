@@ -10,11 +10,13 @@ from autoanalyst.reporting.report_generator import create_markdown_report
 
 
 def sample_dataframe() -> pd.DataFrame:
-    return pd.DataFrame({
-        "age": [20, 30, 30, None],
-        "income": [1000, 2000, 2000, 3000],
-        "city": ["Cairo", "Giza", "Giza", None],
-    })
+    return pd.DataFrame(
+        {
+            "age": [20, 30, 30, None],
+            "income": [1000, 2000, 2000, 3000],
+            "city": ["Cairo", "Giza", "Giza", None],
+        }
+    )
 
 
 def test_generate_basic_profile() -> None:
@@ -53,10 +55,5 @@ def test_create_markdown_report(tmp_path) -> None:
     assert report_path == output_path
     assert output_path.exists()
     assert output_path.read_text(encoding="utf-8") == (
-        "# Sample Analysis\n"
-        "\n"
-        "## Key Insights\n"
-        "\n"
-        "- Dataset has 4 rows.\n"
-        "- No missing values after cleaning.\n"
+        "# Sample Analysis\n\n## Key Insights\n\n- Dataset has 4 rows.\n- No missing values after cleaning.\n"
     )

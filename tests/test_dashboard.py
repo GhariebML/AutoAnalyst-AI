@@ -153,9 +153,7 @@ class TestSupervisorAccessors:
         from autoanalyst.agents.graph import AutoAnalystConfig
         from autoanalyst.agents.supervisor import SupervisedRun
 
-        run = SupervisedRun(
-            AutoAnalystConfig(dataset_path=EXAMPLE_CSV(), require_approval=True)
-        )
+        run = SupervisedRun(AutoAnalystConfig(dataset_path=EXAMPLE_CSV(), require_approval=True))
         run.start()
         assert run.finished is False
         assert run.pending_approval() == "cleaning"

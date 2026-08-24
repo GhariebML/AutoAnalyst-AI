@@ -1,8 +1,8 @@
 """End-to-end analysis pipeline for AutoAnalyst AI.
 
-This module is the central integration layer. Feature teams should keep their
-module functions focused, then connect them here so the dashboard and future
-agent workflows can run one consistent system workflow.
+This module is the central integration layer. Feature teams keep their
+module functions focused, then connect them here so the dashboard, CLI,
+and agent workflows run one consistent system workflow.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from typing import Any, Literal
 
 import pandas as pd
 
-from autoanalyst.data_loading.loader import load_csv, load_excel
+from autoanalyst.data_loading.loader import load_dataset as loader_load_dataset
 from autoanalyst.data_profiling.profiler import generate_basic_profile, get_missing_values_report
 from autoanalyst.eda.analyzer import get_correlation_matrix, get_numeric_summary
 from autoanalyst.evaluation.evaluator import evaluate_classification, evaluate_regression
@@ -63,13 +63,8 @@ class PipelineResult:
 
 
 def load_dataset(file_path: str) -> pd.DataFrame:
-    """Load a dataset from CSV or Excel using the project loading contract."""
-    suffix = Path(file_path).suffix.lower()
-    if suffix == ".csv":
-        return load_csv(file_path)
-    if suffix in {".xlsx", ".xls"}:
-        return load_excel(file_path)
-    raise ValueError("Unsupported file type. Use CSV or Excel files.")
+    """Load a dataset from CSV, Excel, Parquet, JSON, or SQLite."""
+    return loader_load_dataset(file_path)
 
 
 def run_analysis_pipeline(
@@ -81,7 +76,7 @@ def run_analysis_pipeline(
     Parameters
     ----------
     dataset:
-        Either a path to a CSV/Excel file or an already loaded pandas DataFrame.
+        Either a path to a dataset file or an already loaded pandas DataFrame.
     config:
         Optional pipeline configuration.
 
@@ -118,9 +113,13 @@ def run_analysis_pipeline(
         logger.info("Modeling: target='%s', task='%s'", config.target_column, config.model_task)
         model_results, evaluation_results = _train_and_evaluate(model_ready_df, config, warnings)
 
-    insights = generate_dataset_insights(cleaned_df)
-    if evaluation_results:
-        insights.append("Model evaluation results were generated for the selected target column.")
+    insights = generate_dataset_insights(
+        cleaned_df,
+        profile=profile,
+        eda_results=eda_results,
+        model_results=model_results,
+        evaluation_results=evaluation_results,
+    )
 
     report_path = None
     if config.report_path:
@@ -197,6 +196,7 @@ def _train_and_evaluate(
         test_size = _safe_classification_test_size(y, config.model_test_size)
         X_train, X_test, y_train, y_test = classifier.train(X, y, test_size=test_size)
         predictions = classifier.predict(X_test)
+        y_proba = classifier.predict_proba(X_test)
         return (
             {
                 "task": task,
@@ -204,15 +204,20 @@ def _train_and_evaluate(
                 "train_rows": len(X_train),
                 "test_rows": len(X_test),
             },
-            evaluate_classification(y_test, predictions),
+            evaluate_classification(y_test, predictions, y_proba=y_proba),
         )
 
     regressor = RegressionModel(random_state=config.random_state)
     X_train, X_test, y_train, y_test = regressor.train(X, y, test_size=config.model_test_size)
     predictions = regressor.predict(X_test)
     return (
-        {"task": task, "model_name": "RandomForestRegressor", "train_rows": len(X_train), "test_rows": len(X_test)},
-        evaluate_regression(y_test, predictions),
+        {
+            "task": task,
+            "model_name": "RandomForestRegressor",
+            "train_rows": len(X_train),
+            "test_rows": len(X_test),
+        },
+        evaluate_regression(y_test, predictions, n_features=X.shape[1]),
     )
 
 

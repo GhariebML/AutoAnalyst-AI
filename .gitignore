@@ -43,3 +43,16 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Local run history / experiment tracking
+.autoanalyst/
+uploads/
+reports/*.html
+reports/*.json
+reports/*.csv
+*.sqlite3
+
+# Frontend dependencies and builds
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/

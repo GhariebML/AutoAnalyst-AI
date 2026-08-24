@@ -103,9 +103,7 @@ class TestClassificationMetrics:
     def test_roc_auc_omitted_without_proba_or_single_class(self) -> None:
         y_true, y_pred, _ = _binary_case()
         assert "roc_auc" not in evaluate_classification(y_true, y_pred)
-        single = evaluate_classification(
-            np.zeros(3), np.zeros(3), y_proba=np.full((3, 2), 0.5), labels=[0, 1]
-        )
+        single = evaluate_classification(np.zeros(3), np.zeros(3), y_proba=np.full((3, 2), 0.5), labels=[0, 1])
         assert "roc_auc" not in single
         # explicit labels keep the matrix well-shaped for degenerate splits
         assert np.asarray(single["confusion_matrix"]).shape == (2, 2)
@@ -245,16 +243,15 @@ class TestFullReport:
 
 class TestGraphIntegrationM4:
     def test_golden_run_surfaces_new_capabilities(self) -> None:
-        from tests.test_agent_graph import EXAMPLE_CSV  # reuse canonical fixture path
-
-        if not EXAMPLE_CSV.exists():
+        example_csv = Path(__file__).resolve().parents[1] / "data" / "sample" / "example.csv"
+        if not example_csv.exists():
             pytest.skip("data/sample/example.csv not present")
         from autoanalyst.agents.graph import AutoAnalystConfig, run_agent_pipeline
 
-        report_path = EXAMPLE_CSV.parent.parent / "reports" / "_m4_smoke.md"
+        report_path = example_csv.parent.parent / "reports" / "_m4_smoke.md"
         result = run_agent_pipeline(
             AutoAnalystConfig(
-                dataset_path=str(EXAMPLE_CSV),
+                dataset_path=str(example_csv),
                 target_column="loan_status",
                 report_path=str(report_path),
             )

@@ -1,18 +1,15 @@
-"""Streamlit dashboard for AutoAnalyst AI.
-
-Two modes:
-- Quick pipeline: single-shot ``run_analysis_pipeline`` (original behavior).
-- Agent workflow: supervised LangGraph run with trace viewer, human-in-the-loop
-  approvals, executive summary, and report/data downloads.
-"""
+"""AutoAnalyst AI — Enterprise Autonomous Data Intelligence Platform & Multi-Agent Studio."""
 
 from __future__ import annotations
 
+import io
+import json
 import sys
+import tempfile
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -21,246 +18,570 @@ if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
 from autoanalyst.agents.graph import AutoAnalystConfig  # noqa: E402
-from autoanalyst.agents.llm import create_llm, load_llm_settings  # noqa: E402
+from autoanalyst.agents.llm import load_llm_settings  # noqa: E402
+from autoanalyst.agents.qa import answer_question  # noqa: E402
 from autoanalyst.agents.supervisor import SupervisedRun  # noqa: E402
-from autoanalyst.dashboard.helpers import (  # noqa: E402
-    RunContext,
-    answer_question,
-    build_run_context,
-    save_upload_to_temp,
-    scalar_metrics,
-    trace_to_dataframe,
+from autoanalyst.dashboard.helpers import save_upload_to_temp, trace_to_dataframe  # noqa: E402
+from autoanalyst.data_loading.loader import load_dataset  # noqa: E402
+from autoanalyst.eda.analyzer import (  # noqa: E402
+    get_categorical_frequencies,
+    get_correlation_matrix,
+    get_outliers_summary,
 )
-from autoanalyst.pipeline import PipelineConfig, run_analysis_pipeline  # noqa: E402
+from autoanalyst.memory.run_store import RunStore  # noqa: E402
+from autoanalyst.pipeline import PipelineConfig, PipelineResult, run_analysis_pipeline  # noqa: E402
+from autoanalyst.reporting.report_generator import (  # noqa: E402
+    create_full_report,
+    create_html_report,
+)
 
-st.set_page_config(page_title="AutoAnalyst AI", page_icon="📊", layout="wide")
-st.title("📊 AutoAnalyst AI")
-st.caption("Automated AI-Powered Data Analyst System — now with a supervised agent workflow")
+# Page configuration
+st.set_page_config(
+    page_title="AutoAnalyst AI | Autonomous Data Intelligence",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
+# Custom Enterprise Styling
+st.markdown(
+    """
+    <style>
+    .main-title { font-size: 2.2rem; font-weight: 800; color: #1E293B; margin-bottom: 0px; }
+    .main-subtitle { font-size: 1.05rem; color: #64748B; margin-bottom: 24px; }
+    .kpi-container {
+        background-color: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .kpi-title {
+        font-size: 0.82rem; font-weight: 600; color: #64748B;
+        text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .kpi-value { font-size: 1.7rem; font-weight: 700; color: #0F172A; margin-top: 4px; }
+    .step-badge-ok {
+        background: #DCFCE7; color: #15803D; padding: 4px 8px;
+        border-radius: 4px; font-weight: 600; font-size: 0.8rem;
+    }
+    .step-badge-skipped {
+        background: #F1F5F9; color: #64748B; padding: 4px 8px;
+        border-radius: 4px; font-weight: 600; font-size: 0.8rem;
+    }
+    .step-badge-error {
+        background: #FEE2E2; color: #B91C1C; padding: 4px 8px;
+        border-radius: 4px; font-weight: 600; font-size: 0.8rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-def render_quick_mode(df: pd.DataFrame, target_options: list[str]) -> None:
-    """Original single-shot pipeline experience."""
-    st.sidebar.header("Pipeline Options")
-    target_column = st.sidebar.selectbox("Optional target column", target_options)
-    model_task = st.sidebar.selectbox("Model task", ["auto", "classification", "regression"])
+# Initialize Session State
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+if "pipeline_result" not in st.session_state:
+    st.session_state.pipeline_result = None
+if "supervised_run" not in st.session_state:
+    st.session_state.supervised_run = None
+if "run_store" not in st.session_state:
+    st.session_state.run_store = RunStore()
 
+# ---------------------------------------------------------------------------
+# Sidebar Configuration
+# ---------------------------------------------------------------------------
+st.sidebar.image("docs/Assets/autoanalyst_banner.png", use_container_width=True)
+st.sidebar.markdown("### ⚙️ Pipeline Control")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload Dataset",
+    type=["csv", "xlsx", "xls", "parquet", "json", "sqlite", "db"],
+    help="Supports CSV, Excel, Parquet, JSON, and SQLite files.",
+)
+
+# Execution Mode
+mode = st.sidebar.radio(
+    "Execution Architecture",
+    ["Fast Autonomous Pipeline", "Multi-Agent Studio (HITL)"],
+    index=0,
+    help=(
+        "Fast Mode executes the full pipeline instantly. "
+        "Agent Studio provides step-by-step approvals and live state tracing."
+    ),
+)
+
+agent_mode = mode == "Multi-Agent Studio (HITL)"
+llm_settings = load_llm_settings()
+
+if agent_mode:
+    llm_status = f"Enabled ({llm_settings.provider.upper()})" if llm_settings.enabled else "Disabled (Rule Heuristics)"
+    st.sidebar.caption(f"🤖 LLM Narration: **{llm_status}**")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🎯 Target & Task")
+
+target_col = ""
+model_task = "auto"
+missing_strategy = "median"
+
+if uploaded_file is not None:
     try:
-        result = run_analysis_pipeline(
-            df,
-            PipelineConfig(target_column=target_column or None, model_task=model_task),
+        suffix = Path(uploaded_file.name).suffix.lower()
+        temp_path = save_upload_to_temp(uploaded_file, suffix=suffix)
+        df_preview = load_dataset(temp_path)
+        col_options = [""] + list(df_preview.columns)
+        target_col = st.sidebar.selectbox("Target Column (Optional)", col_options, index=0)
+        model_task = st.sidebar.selectbox("Task Type", ["auto", "classification", "regression"], index=0)
+        missing_strategy = st.sidebar.selectbox(
+            "Imputation Strategy",
+            ["median", "mean", "mode", "knn", "forward_fill", "drop"],
+            index=0,
         )
     except Exception as exc:
-        st.error(f"Pipeline failed: {exc}")
-        st.stop()
+        st.sidebar.error(f"Error reading file preview: {exc}")
 
-    st.subheader("Dataset Preview")
-    st.dataframe(result.raw_df.head(20), use_container_width=True)
+require_approval = False
+fail_fast = False
+if agent_mode:
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🛡️ Agent Supervisor")
+    require_approval = st.sidebar.checkbox("Human-in-the-Loop Approvals", value=True)
+    fail_fast = st.sidebar.checkbox("Fail-Fast Circuit Breaker", value=False)
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Raw Rows", result.raw_df.shape[0])
-    col2.metric("Raw Columns", result.raw_df.shape[1])
-    col3.metric("Cleaned Rows", result.cleaned_df.shape[0])
-    col4.metric("Missing Values", int(result.raw_df.isna().sum().sum()))
+st.sidebar.markdown("---")
+run_btn = st.sidebar.button("🚀 Execute Analysis", type="primary", use_container_width=True)
 
-    st.subheader("Data Profile")
-    st.json(result.profile)
-
-    st.subheader("Missing Values Report")
-    st.dataframe(result.missing_values_report, use_container_width=True)
-
-    st.subheader("Basic Statistics")
-    if "numeric_summary" in result.eda_results:
-        st.dataframe(result.eda_results["numeric_summary"], use_container_width=True)
-    else:
-        st.info("No numeric columns found for numeric summary.")
-
-    if "correlation_matrix" in result.eda_results:
-        st.subheader("Correlation Matrix")
-        st.dataframe(result.eda_results["correlation_matrix"], use_container_width=True)
-
-    if result.evaluation_results:
-        st.subheader("Model Evaluation")
-        st.json(result.evaluation_results)
-
-    st.subheader("Starter Insights")
-    for insight in result.insights:
-        st.write(f"- {insight}")
-
-    if result.warnings:
-        st.subheader("Pipeline Warnings")
-        for warning in result.warnings:
-            st.warning(warning)
-
-
-def render_agent_mode(uploaded_file: Any, target_options: list[str]) -> None:
-    """Supervised agent run with trace, HITL gates, and downloads."""
-    st.sidebar.header("Agent Options")
-    target_column = st.sidebar.selectbox("Target column", target_options) or None
-    require_approval = st.sidebar.checkbox("Human approval before cleaning/modeling", value=False)
-    fail_fast = st.sidebar.checkbox("Fail fast on first error", value=False)
-    max_retries = st.sidebar.slider("Retries per node", 0, 5, 2)
-
-    try:
-        dataset_path = save_upload_to_temp(uploaded_file)
-    except ValueError as exc:
-        st.error(str(exc))
-        st.stop()
-
-    config = AutoAnalystConfig(
-        dataset_path=dataset_path,
-        target_column=target_column,
-        require_approval=require_approval,
-        fail_fast=fail_fast,
-        max_retries=max_retries,
-    )
-
-    session_key = f"agent_run_{config.model_dump_json()}"
-    run = st.session_state.get("agent_run")
-    if run is None or st.session_state.get("agent_session_key") != session_key:
-        try:
-            run = SupervisedRun(config)
-            run.start()
-        except Exception as exc:
-            st.error(f"Agent run failed to start: {exc}")
-            st.stop()
-        st.session_state["agent_run"] = run
-        st.session_state["agent_session_key"] = session_key
-
-    if not run.finished and _handle_approval_gate(run):
-        st.rerun()
-
-    if not run.finished:
-        st.info("Agent workflow is running…")
-        return
-
-    _render_agent_results(run, target_column)
-
-
-def _handle_approval_gate(run: SupervisedRun) -> bool:
-    """Render approve/decline controls; True when the operator made a choice."""
-    pending = run.pending_approval()
-    if pending is None:
-        return False
-
-    st.warning(f"⏸ Awaiting your approval before the **{pending}** step.")
-    col_approve, col_decline = st.columns(2)
-    if col_approve.button(f"✅ Approve '{pending}'", type="primary"):
-        run.approve(pending, approved=True)
-        run.resume()
-        return True
-    if col_decline.button(f"🚫 Decline '{pending}'"):
-        run.approve(pending, approved=False)
-        run.resume()
-        return True
-    return False
-
-
-def _render_agent_results(run: SupervisedRun, target_column: str | None) -> None:
-    result = run.final_result()
-
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Rows", result.raw_df.shape[0])
-    col2.metric("Columns", result.raw_df.shape[1])
-    col3.metric("Cleaned Rows", result.cleaned_df.shape[0])
-    col4.metric("Narration", "LLM" if _llm_enabled() else "Rules")
-
-    if result.executive_summary:
-        st.subheader("Executive Summary")
-        st.write(result.executive_summary)
-
-    left, right = st.columns([2, 3])
-
-    with left:
-        st.subheader("Run Trace")
-        trace_df = trace_to_dataframe(run.trace())
-        if not trace_df.empty:
-            st.dataframe(trace_df, use_container_width=True, hide_index=True)
-
-    with right:
-        st.subheader("Model Evaluation")
-        metrics = scalar_metrics(result.evaluation_results)
-        if metrics:
-            metric_cols = st.columns(min(len(metrics), 4))
-            for index, (key, value) in enumerate(metrics.items()):
-                metric_cols[index % len(metric_cols)].metric(key.upper(), f"{value:.4f}")
-        confusion = (result.evaluation_results or {}).get("confusion_matrix")
-        if confusion:
-            st.caption("Confusion matrix (rows = actual)")
-            st.dataframe(pd.DataFrame(confusion), use_container_width=True)
-        if not metrics:
-            st.info("No modeling was performed for this run.")
-
-    for warning in result.warnings:
-        st.warning(warning)
-
-    st.subheader("Key Findings")
-    for insight in result.insights:
-        st.write(f"- {insight}")
-
-    _render_downloads(result)
-    _render_qa_panel(build_run_context(result, target_column))
-
-
-def _render_downloads(result: Any) -> None:
-    st.subheader("Downloads")
-    col_md, col_csv = st.columns(2)
-    if result.report_path and Path(str(result.report_path)).exists():
-        report_text = Path(str(result.report_path)).read_text(encoding="utf-8")
-        col_md.download_button(
-            "⬇️ Download analysis report (.md)",
-            data=report_text,
-            file_name="autoanalyst_report.md",
-            mime="text/markdown",
-        )
-    else:
-        col_md.caption("Report was not generated for this run.")
-    col_csv.download_button(
-        "⬇️ Download cleaned data (.csv)",
-        data=result.cleaned_df.to_csv(index=False).encode("utf-8"),
-        file_name="autoanalyst_cleaned.csv",
-        mime="text/csv",
-    )
-
-
-def _render_qa_panel(context: RunContext) -> None:
-    st.subheader("Ask about this run")
-    llm = _resolve_llm_safe()
-    question = st.text_input(
-        "Your question",
-        placeholder="e.g. How many rows? What is the F1 score? Summarize the findings.",
-    )
-    if st.button("Ask") and question.strip():
-        with st.spinner("Thinking…" if llm else "Looking up facts…"):
-            st.markdown(answer_question(context, question, llm=llm))
-
-
-@st.cache_data(show_spinner=False)
-def _llm_enabled() -> bool:
-    return load_llm_settings().enabled
-
-
-def _resolve_llm_safe() -> Any:
-    try:
-        return create_llm(load_llm_settings())
-    except RuntimeError as exc:
-        st.sidebar.caption(f"LLM narration off: {exc}")
-        return None
-
-
-mode = st.sidebar.radio("Mode", ["Quick pipeline", "Agent workflow"])
-uploaded_file = st.file_uploader("Upload a CSV dataset", type=["csv"])
+# ---------------------------------------------------------------------------
+# Main Content Header
+# ---------------------------------------------------------------------------
+st.title("AutoAnalyst AI")
+st.markdown(
+    '<div class="main-subtitle">Enterprise-Grade Autonomous Data Analyst & Multi-Agent Machine Learning Platform</div>',
+    unsafe_allow_html=True,
+)
 
 if uploaded_file is None:
-    st.info("Upload a CSV file to start exploring your dataset.")
+    st.info(
+        "👋 Welcome! Please upload a dataset (CSV, Excel, Parquet, JSON, SQLite) "
+        "in the sidebar to begin autonomous analysis."
+    )
     st.stop()
 
-try:
-    df_preview = pd.read_csv(uploaded_file)
-except Exception as exc:
-    st.error(f"Could not read the uploaded file: {exc}")
+# ---------------------------------------------------------------------------
+# Execution Logic
+# ---------------------------------------------------------------------------
+if run_btn:
+    with st.spinner("Processing dataset through analytical engine..."):
+        try:
+            if not agent_mode:
+                config = PipelineConfig(
+                    target_column=target_col if target_col else None,
+                    model_task=model_task,
+                    missing_strategy=missing_strategy,
+                )
+                result = run_analysis_pipeline(temp_path, config=config)
+                st.session_state.pipeline_result = result
+                st.session_state.supervised_run = None
+            else:
+                agent_config = AutoAnalystConfig(
+                    dataset_path=temp_path,
+                    target_column=target_col if target_col else None,
+                    require_approval=require_approval,
+                    fail_fast=fail_fast,
+                    missing_strategy=missing_strategy,
+                )
+                sup_run = SupervisedRun(agent_config)
+                sup_run.start()
+                st.session_state.supervised_run = sup_run
+                st.session_state.pipeline_result = sup_run.final_result()
+        except Exception as exc:
+            st.error(f"Execution failed: {exc}")
+            st.stop()
+
+# Human In The Loop Modal / Controls if Paused
+if agent_mode and st.session_state.supervised_run is not None:
+    sup_run = st.session_state.supervised_run
+    pending = sup_run.pending_approval()
+    if pending:
+        st.warning(f"⏸️ **Human-in-the-Loop Gate:** Workflow paused before `{pending}` stage for your review.")
+        col_app, col_mod, col_res = st.columns([1, 1, 2])
+        if col_app.button(f"✅ Approve {pending.capitalize()}", key=f"app_{pending}"):
+            sup_run.approve(pending, True)
+            sup_run.resume()
+            st.session_state.pipeline_result = sup_run.final_result()
+            st.rerun()
+        if col_mod.button(f"❌ Skip {pending.capitalize()}", key=f"skip_{pending}"):
+            sup_run.approve(pending, False)
+            sup_run.resume()
+            st.session_state.pipeline_result = sup_run.final_result()
+            st.rerun()
+
+result: PipelineResult | None = st.session_state.pipeline_result
+if result is None:
+    st.info("Dataset uploaded. Click **Execute Analysis** in the sidebar to run the autonomous pipeline.")
     st.stop()
 
-if mode == "Quick pipeline":
-    render_quick_mode(df_preview, [""] + list(df_preview.columns))
-else:
-    render_agent_mode(uploaded_file, [""] + list(df_preview.columns))
+# ---------------------------------------------------------------------------
+# KPI Summary Header Cards
+# ---------------------------------------------------------------------------
+profile = result.profile or {}
+health_score = profile.get("health_score", 100.0)
+grade = profile.get("quality_grade", "A")
+total_rows = result.raw_df.shape[0]
+total_cols = result.raw_df.shape[1]
+missing_total = int(result.raw_df.isna().sum().sum())
+mem_str = profile.get("memory_footprint_formatted", "N/A")
+
+k1, k2, k3, k4, k5, k6 = st.columns(6)
+with k1:
+    st.markdown(
+        f'<div class="kpi-container"><div class="kpi-title">Data Quality</div>'
+        f'<div class="kpi-value">{health_score:.1f}% ({grade})</div></div>',
+        unsafe_allow_html=True,
+    )
+with k2:
+    st.markdown(
+        f'<div class="kpi-container"><div class="kpi-title">Total Rows</div>'
+        f'<div class="kpi-value">{total_rows:,}</div></div>',
+        unsafe_allow_html=True,
+    )
+with k3:
+    st.markdown(
+        f'<div class="kpi-container"><div class="kpi-title">Columns</div>'
+        f'<div class="kpi-value">{total_cols}</div></div>',
+        unsafe_allow_html=True,
+    )
+with k4:
+    st.markdown(
+        f'<div class="kpi-container"><div class="kpi-title">Missing Values</div>'
+        f'<div class="kpi-value">{missing_total:,}</div></div>',
+        unsafe_allow_html=True,
+    )
+with k5:
+    st.markdown(
+        f'<div class="kpi-container"><div class="kpi-title">Memory</div><div class="kpi-value">{mem_str}</div></div>',
+        unsafe_allow_html=True,
+    )
+with k6:
+    score_label = "N/A"
+    if result.evaluation_results:
+        if "accuracy" in result.evaluation_results:
+            score_label = f"{result.evaluation_results['accuracy'] * 100:.1f}% Acc"
+        elif "rmse" in result.evaluation_results:
+            score_label = f"{result.evaluation_results['rmse']:.2f} RMSE"
+    st.markdown(
+        f'<div class="kpi-container"><div class="kpi-title">Model Score</div>'
+        f'<div class="kpi-value">{score_label}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Tabbed Workspace
+# ---------------------------------------------------------------------------
+tabs = st.tabs(
+    [
+        "📊 Data Profile & Quality",
+        "📈 Exploratory Visuals",
+        "🤖 ML Models & Diagnostics",
+        "💡 Insights & Strategy",
+        "🔍 Agent Studio Flow",
+        "💬 Conversational Assistant",
+        "🕒 Historical Runs",
+        "📥 Export Center",
+    ]
+)
+
+# ---------------------------------------------------------------------------
+# Tab 1: Profile & Data Quality
+# ---------------------------------------------------------------------------
+with tabs[0]:
+    st.subheader("Dataset Preview")
+    st.dataframe(result.raw_df.head(25), use_container_width=True)
+
+    c_p1, c_p2 = st.columns([1, 1])
+    with c_p1:
+        st.subheader("Data Quality Dimensions")
+        qr = profile.get("quality_report")
+        if qr:
+            st.metric("Completeness Score", f"{qr.get('completeness_score', 100):.1f}%")
+            st.metric("Uniqueness Score", f"{qr.get('uniqueness_score', 100):.1f}%")
+            st.metric("Uniformity Score", f"{qr.get('uniformity_score', 100):.1f}%")
+            st.metric("Validity Score", f"{qr.get('validity_score', 100):.1f}%")
+        else:
+            st.info("Standard profile generated.")
+
+    with c_p2:
+        st.subheader("Missing Values Report")
+        if not result.missing_values_report.empty:
+            st.dataframe(result.missing_values_report, use_container_width=True)
+        else:
+            st.success("Zero missing values detected across all columns.")
+
+# ---------------------------------------------------------------------------
+# Tab 2: Exploratory Visuals (Plotly)
+# ---------------------------------------------------------------------------
+with tabs[1]:
+    st.subheader("Interactive Statistical Visualizations")
+
+    num_cols = list(result.raw_df.select_dtypes(include="number").columns)
+    if len(num_cols) >= 2:
+        st.markdown("#### Correlation Matrix")
+        corr_method = st.radio("Correlation Method", ["pearson", "spearman"], horizontal=True)
+        corr_matrix = get_correlation_matrix(result.raw_df, method=corr_method)
+        fig_corr = px.imshow(
+            corr_matrix,
+            text_auto=".2f",
+            aspect="auto",
+            color_continuous_scale="Blues",
+            title=f"{corr_method.capitalize()} Correlation Heatmap",
+        )
+        st.plotly_chart(fig_corr, use_container_width=True)
+
+    if num_cols:
+        col_dist1, col_dist2 = st.columns(2)
+        with col_dist1:
+            selected_num = st.selectbox("Select Numeric Feature for Distribution", num_cols)
+            fig_hist = px.histogram(
+                result.raw_df,
+                x=selected_num,
+                marginal="box",
+                nbins=30,
+                title=f"Distribution & Outlier Boxplot for '{selected_num}'",
+                color_discrete_sequence=["#3B82F6"],
+            )
+            st.plotly_chart(fig_hist, use_container_width=True)
+
+        with col_dist2:
+            st.markdown("#### Outlier Summary")
+            outlier_df = get_outliers_summary(result.raw_df)
+            if not outlier_df.empty:
+                st.dataframe(outlier_df, use_container_width=True)
+
+    cat_cols = list(result.raw_df.select_dtypes(include=["object", "category", "string"]).columns)
+    if cat_cols:
+        st.markdown("#### Categorical Frequency Distributions")
+        selected_cat = st.selectbox("Select Categorical Feature", cat_cols)
+        freq_df = get_categorical_frequencies(result.raw_df, selected_cat, top_n=10)
+        fig_bar = px.bar(
+            freq_df,
+            x="value",
+            y="count",
+            text="percent",
+            title=f"Top Categories in '{selected_cat}'",
+            color_discrete_sequence=["#10B981"],
+        )
+        st.plotly_chart(fig_bar, use_container_width=True)
+
+# ---------------------------------------------------------------------------
+# Tab 3: ML Models & Diagnostics
+# ---------------------------------------------------------------------------
+with tabs[2]:
+    if result.model_results and result.evaluation_results:
+        task = result.model_results.get("task", "classification")
+        st.subheader(f"Machine Learning Benchmark — {task.capitalize()}")
+
+        col_m1, col_m2 = st.columns(2)
+        with col_m1:
+            st.markdown("#### Model Specifications")
+            st.json(result.model_results)
+
+        with col_m2:
+            st.markdown("#### Core Evaluation Metrics")
+            eval_clean = {k: v for k, v in result.evaluation_results.items() if isinstance(v, (int, float))}
+            st.json(eval_clean)
+
+        # Classification Specific Visualizations
+        if task == "classification":
+            cm = result.evaluation_results.get("confusion_matrix")
+            if cm:
+                st.markdown("#### Confusion Matrix")
+                labels = result.evaluation_results.get("classification_report", {}).keys()
+                clean_labels = [str(lbl) for lbl in labels if lbl not in {"accuracy", "macro avg", "weighted avg"}][
+                    : len(cm)
+                ]
+                if not clean_labels:
+                    clean_labels = [str(i) for i in range(len(cm))]
+
+                fig_cm = px.imshow(
+                    cm,
+                    text_auto=True,
+                    x=clean_labels,
+                    y=clean_labels,
+                    labels=dict(x="Predicted Class", y="Actual Class"),
+                    color_continuous_scale="Viridis",
+                )
+                st.plotly_chart(fig_cm, use_container_width=True)
+
+        elif task == "regression":
+            res_summary = result.evaluation_results.get("residuals_summary")
+            if res_summary:
+                st.markdown("#### Residuals Diagnostics")
+                st.json(res_summary)
+    else:
+        st.info(
+            "No model was trained because no target column was configured. "
+            "Configure a target in the sidebar to train models."
+        )
+
+# ---------------------------------------------------------------------------
+# Tab 4: Insights & Strategy
+# ---------------------------------------------------------------------------
+with tabs[3]:
+    st.subheader("💡 Autonomous Insights & Strategy")
+    if result.executive_summary:
+        st.markdown("#### Executive Summary")
+        st.info(result.executive_summary)
+
+    st.markdown("#### Key Data Findings & Recommendations")
+    for insight in result.insights:
+        st.markdown(f"- {insight}")
+
+    if result.warnings:
+        st.markdown("#### ⚠️ Pipeline Warnings & Non-Fatal Alerts")
+        for w in result.warnings:
+            st.warning(w)
+
+# ---------------------------------------------------------------------------
+# Tab 5: Agent Studio Flow
+# ---------------------------------------------------------------------------
+with tabs[4]:
+    st.subheader("🔍 LangGraph Agent Execution Trace")
+    if agent_mode and st.session_state.supervised_run is not None:
+        trace_data = st.session_state.supervised_run.trace()
+        if trace_data:
+            trace_df = trace_to_dataframe(trace_data)
+            st.dataframe(trace_df, use_container_width=True)
+        else:
+            st.info("Workflow initialized; awaiting execution.")
+    else:
+        st.info(
+            "Run in **Multi-Agent Studio (HITL)** mode to observe live "
+            "agent transitions, node durations, and supervisor retries."
+        )
+
+# ---------------------------------------------------------------------------
+# Tab 6: Conversational Assistant
+# ---------------------------------------------------------------------------
+with tabs[5]:
+    st.subheader("💬 Dataset & Model Intelligence Assistant")
+    st.caption("Ask questions about feature distributions, missingness, model performance, or business impact.")
+
+    # Quick prompt shortcuts
+    q_col1, q_col2, q_col3, q_col4 = st.columns(4)
+    quick_q = None
+    if q_col1.button("📊 Explain Dataset Shape"):
+        quick_q = "What is the dataset shape and composition?"
+    if q_col2.button("⚠️ Check Missing Values"):
+        quick_q = "Which columns have missing values?"
+    if q_col3.button("🤖 Summarize Model Score"):
+        quick_q = "How well did the model perform?"
+    if q_col4.button("💡 Top Business Insights"):
+        quick_q = "What are the top insights?"
+
+    user_query = st.chat_input("Ask a question about the dataset or model results...")
+    active_query = user_query or quick_q
+
+    if active_query:
+        answer_obj = answer_question(result, active_query, llm=None)
+        st.session_state.chat_history.append((active_query, answer_obj.text, answer_obj.source))
+
+    for q, ans, src in st.session_state.chat_history[-8:]:
+        with st.chat_message("user"):
+            st.write(q)
+        with st.chat_message("assistant"):
+            st.write(ans)
+            st.caption(f"Source: {src}")
+
+# ---------------------------------------------------------------------------
+# Tab 7: Historical Runs
+# ---------------------------------------------------------------------------
+with tabs[6]:
+    st.subheader("🕒 Historical Runs & Experiment Tracking")
+    recent_runs = st.session_state.run_store.list_recent(limit=10)
+    if recent_runs:
+        records_data = [
+            {
+                "Run ID": r.run_id[:8],
+                "Timestamp": r.created_at,
+                "Rows": r.rows,
+                "Columns": r.columns,
+                "Target": r.target_column or "None",
+                "Metrics": json.dumps(r.scalar_metrics),
+            }
+            for r in recent_runs
+        ]
+        st.dataframe(pd.DataFrame(records_data), use_container_width=True)
+    else:
+        st.info("No historical runs recorded yet in `.autoanalyst/runs.jsonl`.")
+
+# ---------------------------------------------------------------------------
+# Tab 8: Export Center
+# ---------------------------------------------------------------------------
+with tabs[7]:
+    st.subheader("📥 Export Center — Artifact Downloads")
+    st.markdown("Download reports and cleaned artifacts compiled from the current run.")
+
+    e_col1, e_col2, e_col3 = st.columns(3)
+
+    # HTML Report Download
+    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp_html:
+        create_html_report(
+            tmp_html.name,
+            title="AutoAnalyst AI Analysis Report",
+            profile=result.profile or {},
+            insights=result.insights,
+            missing_report=result.missing_values_report,
+            eda_results=result.eda_results,
+            model_results=result.model_results,
+            evaluation_results=result.evaluation_results,
+            warnings=result.warnings,
+            executive_summary=result.executive_summary,
+        )
+        html_bytes = Path(tmp_html.name).read_bytes()
+
+    e_col1.download_button(
+        label="📄 Download HTML Report",
+        data=html_bytes,
+        file_name="autoanalyst_report.html",
+        mime="text/html",
+        use_container_width=True,
+    )
+
+    # Markdown Report Download
+    with tempfile.NamedTemporaryFile(suffix=".md", delete=False) as tmp_md:
+        create_full_report(
+            tmp_md.name,
+            title="AutoAnalyst AI Analysis Report",
+            profile=result.profile or {},
+            insights=result.insights,
+            missing_report=result.missing_values_report,
+            eda_results=result.eda_results,
+            model_results=result.model_results,
+            evaluation_results=result.evaluation_results,
+            warnings=result.warnings,
+            executive_summary=result.executive_summary,
+        )
+        md_bytes = Path(tmp_md.name).read_bytes()
+
+    e_col2.download_button(
+        label="📝 Download Markdown Report",
+        data=md_bytes,
+        file_name="autoanalyst_report.md",
+        mime="text/markdown",
+        use_container_width=True,
+    )
+
+    # Cleaned CSV Download
+    csv_buffer = io.StringIO()
+    result.cleaned_df.to_csv(csv_buffer, index=False)
+    e_col3.download_button(
+        label="📊 Download Cleaned CSV",
+        data=csv_buffer.getvalue(),
+        file_name="cleaned_dataset.csv",
+        mime="text/csv",
+        use_container_width=True,
+    )

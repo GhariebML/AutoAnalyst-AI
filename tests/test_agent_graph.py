@@ -63,7 +63,7 @@ class TestGoldenPath:
         trace = final_state["trace"]
         executed = {entry.node for entry in trace}
         assert executed == set(GRAPH_NODES)
-        assert all(entry.status == "ok" for entry in trace)
+        assert all(entry.status in {"ok", "skipped"} for entry in trace)
         assert all(entry.duration_ms >= 0 for entry in trace)
 
     def test_trace_routes_around_modeling_without_target(self, example_csv: str) -> None:

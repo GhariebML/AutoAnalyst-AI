@@ -161,4 +161,3 @@ __all__ = [
     "scalar_metrics",
     "trace_to_dataframe",
 ]
-

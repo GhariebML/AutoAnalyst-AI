@@ -28,11 +28,13 @@ from autoanalyst.agents.tools import (
 
 
 def sample_dataframe() -> pd.DataFrame:
-    return pd.DataFrame({
-        "age": [20, 30, 30, None],
-        "income": [1000, 2000, 2000, 3000],
-        "city": ["Cairo", "Giza", "Giza", None],
-    })
+    return pd.DataFrame(
+        {
+            "age": [20, 30, 30, None],
+            "income": [1000, 2000, 2000, 3000],
+            "city": ["Cairo", "Giza", "Giza", None],
+        }
+    )
 
 
 class TestToolRegistry:
@@ -72,9 +74,11 @@ class TestLoadDatasetTool:
         result = load_dataset_tool.invoke({"file_path": str(path)})
         assert list(result.columns) == ["age", "income", "city"]
 
-    def test_rejects_unsupported_extension(self) -> None:
-        with pytest.raises(ValueError, match="Unsupported file type"):
-            load_dataset_tool.invoke({"file_path": "table.parquet"})
+    def test_rejects_unsupported_extension(self, tmp_path: Path) -> None:
+        p = tmp_path / "table.unknown_ext"
+        p.write_text("data")
+        with pytest.raises(ValueError, match="Unsupported file"):
+            load_dataset_tool.invoke({"file_path": str(p)})
 
     def test_rejects_missing_file(self, tmp_path: Path) -> None:
         with pytest.raises(Exception):
@@ -155,10 +159,12 @@ class TestInsightAndReportTools:
 
     def test_create_report_writes_file(self, tmp_path: Path) -> None:
         output = tmp_path / "report.md"
-        result = create_report_tool.invoke({
-            "insights": ["Row count is 4."],
-            "output_path": str(output),
-            "title": "T",
-        })
+        result = create_report_tool.invoke(
+            {
+                "insights": ["Row count is 4."],
+                "output_path": str(output),
+                "title": "T",
+            }
+        )
         assert Path(result).exists()
         assert "# T" in output.read_text(encoding="utf-8")

@@ -52,9 +52,7 @@ class TestRetryAndEscalation:
         assert flaky.invoke.call_count == 2
         assert result.raw_df.shape == loaded_df.shape
 
-    def test_exhausted_retries_escalate_and_degrade(
-        self, monkeypatch: pytest.MonkeyPatch, example_csv: str
-    ) -> None:
+    def test_exhausted_retries_escalate_and_degrade(self, monkeypatch: pytest.MonkeyPatch, example_csv: str) -> None:
         failing = _flaky_tool(RuntimeError("boom"))
         failing.invoke.side_effect = RuntimeError("boom")
         monkeypatch.setattr(agent_nodes, "load_dataset_tool", failing)
@@ -99,9 +97,7 @@ class TestFailFast:
         assert executed_nodes == ["intake"]
         assert final_state["errors"]
 
-    def test_without_fail_fast_flow_continues_degraded(
-        self, monkeypatch: pytest.MonkeyPatch, example_csv: str
-    ) -> None:
+    def test_without_fail_fast_flow_continues_degraded(self, monkeypatch: pytest.MonkeyPatch, example_csv: str) -> None:
         failing = MagicMock()
         failing.invoke.side_effect = RuntimeError("non-fatal")
         monkeypatch.setattr(agent_nodes, "load_dataset_tool", failing)

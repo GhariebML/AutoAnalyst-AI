@@ -26,14 +26,17 @@ from langgraph.graph.state import CompiledStateGraph
 from autoanalyst.agents.nodes import (
     cleaning_node,
     dataset_intake_node,
+    drift_node,
     eda_node,
     evaluation_node,
     feature_node,
     insight_node,
+    memory_node,
     modeling_node,
     profiling_node,
     report_node,
 )
+from autoanalyst.agents.plugins import plugins_for_anchor
 from autoanalyst.agents.state import AutoAnalystConfig, AutoAnalystState, create_initial_state
 from autoanalyst.pipeline import PipelineResult
 
@@ -42,6 +45,7 @@ logger = logging.getLogger(__name__)
 GRAPH_NODES = (
     "intake",
     "profiling",
+    "drift",
     "eda",
     "cleaning",
     "features",
@@ -49,6 +53,7 @@ GRAPH_NODES = (
     "evaluation",
     "insights",
     "report",
+    "memory",
 )
 
 
@@ -85,6 +90,7 @@ def build_graph(
 
     builder.add_node("intake", dataset_intake_node)
     builder.add_node("profiling", profiling_node)
+    builder.add_node("drift", drift_node)
     builder.add_node("eda", eda_node)
     builder.add_node("cleaning", cleaning_node)
     builder.add_node("features", feature_node)
@@ -92,10 +98,12 @@ def build_graph(
     builder.add_node("evaluation", evaluation_node)
     builder.add_node("insights", insight_node)
     builder.add_node("report", report_node)
+    builder.add_node("memory", memory_node)
 
     builder.add_edge(START, "intake")
     _supervised_edge(builder, "intake", "profiling")
-    _supervised_edge(builder, "profiling", "eda")
+    _supervised_edge(builder, "profiling", "drift")
+    _supervised_edge(builder, "drift", "eda")
     _supervised_edge(builder, "eda", "cleaning")
     _supervised_edge(builder, "cleaning", "features")
     builder.add_conditional_edges(
@@ -105,10 +113,38 @@ def build_graph(
     )
     _supervised_edge(builder, "modeling", "evaluation")
     _supervised_edge(builder, "evaluation", "insights")
-    _supervised_edge(builder, "insights", "report")
-    builder.add_edge("report", END)
+
+    if not _splice_plugins(builder, "insights", "report"):
+        _supervised_edge(builder, "insights", "report")
+    builder.add_edge("report", "memory")
+    builder.add_edge("memory", END)
     interrupts = list(interrupt_before) if interrupt_before else None
     return builder.compile(checkpointer=checkpointer, interrupt_before=interrupts)
+
+
+def _splice_plugins(builder: StateGraph, anchor: str, successor: str) -> bool:
+    """Wire anchor→[plugin1→…→pluginN]→successor for registered plugins.
+
+    Returns True when plugins were spliced and the caller must skip the
+    direct anchor→successor edge. Registration order defines chain order.
+    """
+    specs = plugins_for_anchor(anchor)
+    if not specs:
+        return False
+
+    names = [spec.name for spec in specs]
+    clashes = sorted(set(names) & set(GRAPH_NODES))
+    if clashes:
+        raise ValueError(f"Plugin names may not shadow built-in nodes: {clashes}")
+
+    for spec in specs:
+        builder.add_node(spec.name, spec.function)
+    builder.add_edge(anchor, names[0])
+    for current, following in zip(names, names[1:]):
+        builder.add_edge(current, following)
+    builder.add_edge(names[-1], successor)
+    logger.info("Spliced %d plugin(s) after '%s': %s", len(specs), anchor, names)
+    return True
 
 
 def run_agent_pipeline(config: AutoAnalystConfig) -> PipelineResult:

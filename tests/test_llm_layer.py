@@ -102,9 +102,7 @@ class TestNarrateInsights:
 
     def test_llm_narration_parsed_and_capped(self, sample_df: pd.DataFrame) -> None:
         response = "- Finding one\n2. Finding two\n* Finding three\n\nplain fourth\n- \n- Finding five"
-        narration = narrate_insights(
-            sample_df, {"rows": 4, "columns": 2}, llm=fake_llm([response]), max_insights=4
-        )
+        narration = narrate_insights(sample_df, {"rows": 4, "columns": 2}, llm=fake_llm([response]), max_insights=4)
         assert narration.source == "llm"
         assert narration.texts == ["Finding one", "Finding two", "Finding three", "plain fourth"]
 
